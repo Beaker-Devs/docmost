@@ -1,0 +1,16 @@
+name: docmost
+id: ari:cloud:compass:49be4dcf-cd38-4a13-b7bb-1ca3044c1a6f:component/b158df58-636b-461c-87e9-730b6c35f860/cc205634-233b-4449-8bff-fac96cb29e23
+description: Docmost is an open-source collaborative wiki and documentation software. It is an open-source alternative to Confluence and Notion.
+configVersion: 1
+typeId: SERVICE
+fields:
+  tier: 4
+links:
+  - name: null
+    type: REPOSITORY
+    url: https://github.com/Beaker-Devs/docmost
+relationships:
+  DEPENDS_ON: []
+labels:
+  - source:github
+customFields: null
