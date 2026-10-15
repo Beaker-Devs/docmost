@@ -9,6 +9,8 @@ import {
   Group,
   Loader,
   Menu,
+  SegmentedControl,
+  Stack,
   Text,
   TextInput,
   Textarea,
@@ -59,12 +61,29 @@ export function CardDrawer({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [parentPageId, setParentPageId] = useState<string | null>(null);
+  const [locationMode, setLocationMode] = useState<"existing" | "new">(
+    "existing",
+  );
+  const [newFolderName, setNewFolderName] = useState("");
 
   useEffect(() => {
     setTitle(card?.title ?? "");
     setDescription(card?.description ?? "");
     setParentPageId(null);
+    setLocationMode("existing");
+    setNewFolderName("");
   }, [card?.id]);
+
+  function handleAddPage() {
+    if (!card) return;
+    if (locationMode === "new" && !newFolderName.trim()) return;
+    createCardPage.mutate({
+      cardId: card.id,
+      parentPageId: parentPageId ?? undefined,
+      newParentTitle:
+        locationMode === "new" ? newFolderName.trim() : undefined,
+    });
+  }
 
   const { data: page, isLoading: pageLoading } = usePageQuery({
     pageId: card?.pageId ?? undefined,
@@ -195,23 +214,49 @@ export function CardDrawer({
             </Box>
           ) : (
             <Box py="sm">
-              <ParentPageSelect
-                spaceId={spaceId}
-                value={parentPageId}
-                onChange={setParentPageId}
-              />
+              <Stack gap="sm">
+                <SegmentedControl
+                  fullWidth
+                  size="xs"
+                  value={locationMode}
+                  onChange={(v) => setLocationMode(v as "existing" | "new")}
+                  data={[
+                    { label: "Existing page", value: "existing" },
+                    { label: "New folder", value: "new" },
+                  ]}
+                />
+
+                {locationMode === "new" && (
+                  <TextInput
+                    label="New folder name"
+                    placeholder="e.g. Roadmap cards"
+                    value={newFolderName}
+                    onChange={(e) => setNewFolderName(e.currentTarget.value)}
+                  />
+                )}
+
+                <ParentPageSelect
+                  spaceId={spaceId}
+                  value={parentPageId}
+                  onChange={setParentPageId}
+                  label={
+                    locationMode === "new"
+                      ? "Create folder inside (optional)"
+                      : "Location"
+                  }
+                />
+              </Stack>
+
               <Group justify="center" mt="md">
                 <Button
                   variant="light"
                   leftSection={<IconFilePlus size={16} />}
                   loading={createCardPage.isPending}
-                  disabled={readOnly}
-                  onClick={() =>
-                    createCardPage.mutate({
-                      cardId: card.id,
-                      parentPageId: parentPageId ?? undefined,
-                    })
+                  disabled={
+                    readOnly ||
+                    (locationMode === "new" && !newFolderName.trim())
                   }
+                  onClick={handleAddPage}
                 >
                   Add page content
                 </Button>

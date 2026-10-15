@@ -193,10 +193,9 @@ export class BoardController {
   ) {
     const boardId = await this.boardIdForCard(dto.cardId);
     await this.assertBoardAbility(user, boardId, SpaceCaslAction.Edit);
-    return this.boardService.createCardPage(
-      user.id,
-      dto.cardId,
-      dto.parentPageId,
-    );
+    return this.boardService.createCardPage(user.id, dto.cardId, {
+      parentPageId: dto.parentPageId,
+      newParentTitle: dto.newParentTitle,
+    });
   }
 }

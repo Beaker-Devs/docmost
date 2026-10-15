@@ -147,10 +147,9 @@ export function useCreateCardPageMutation(boardId: string) {
   return useMutation<
     ICard,
     Error,
-    { cardId: string; parentPageId?: string }
+    { cardId: string; parentPageId?: string; newParentTitle?: string }
   >({
-    mutationFn: ({ cardId, parentPageId }) =>
-      createCardPage(cardId, parentPageId),
+    mutationFn: (data) => createCardPage(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["board", boardId] });
     },

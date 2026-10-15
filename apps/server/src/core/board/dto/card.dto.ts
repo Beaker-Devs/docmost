@@ -64,4 +64,10 @@ export class CreateCardPageDto {
   @IsOptional()
   @IsUUID()
   parentPageId?: string;
+
+  // when set, a new folder page with this title is created (optionally under
+  // parentPageId) and the card's page is nested inside it
+  @IsOptional()
+  @IsString()
+  newParentTitle?: string;
 }

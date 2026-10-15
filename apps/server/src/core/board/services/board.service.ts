@@ -167,7 +167,7 @@ export class BoardService {
   async createCardPage(
     userId: string,
     cardId: string,
-    parentPageId?: string,
+    opts?: { parentPageId?: string; newParentTitle?: string },
   ): Promise<Card> {
     const card = await this.boardRepo.findCardById(cardId);
     if (!card) {
@@ -180,6 +180,20 @@ export class BoardService {
     const board = await this.boardRepo.findById(card.boardId);
     if (!board) {
       throw new NotFoundException('Board not found');
+    }
+
+    let parentPageId = opts?.parentPageId;
+
+    // optionally create a new folder page to house the card's page. The folder
+    // itself can be nested under the selected parent.
+    const newParentTitle = opts?.newParentTitle?.trim();
+    if (newParentTitle) {
+      const folder = await this.pageService.create(userId, board.workspaceId, {
+        title: newParentTitle,
+        spaceId: board.spaceId,
+        parentPageId,
+      });
+      parentPageId = folder.id;
     }
 
     // PageService.create validates that parentPageId (when given) belongs to
