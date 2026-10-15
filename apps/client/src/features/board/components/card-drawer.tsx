@@ -22,6 +22,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
+import { useTranslation } from "react-i18next";
 import { ICard } from "@/features/board/types/board.types";
 import {
   useCreateCardPageMutation,
@@ -54,6 +55,7 @@ export function CardDrawer({
   readOnly,
   onClose,
 }: CardDrawerProps) {
+  const { t } = useTranslation();
   const opened = !!cardId;
   const updateCard = useUpdateCardMutation(boardId);
   const deleteCard = useDeleteCardMutation(boardId);
@@ -108,9 +110,11 @@ export function CardDrawer({
   function confirmDelete() {
     if (!card) return;
     modals.openConfirmModal({
-      title: "Delete card",
-      children: <Text size="sm">This card will be permanently deleted.</Text>,
-      labels: { confirm: "Delete", cancel: "Cancel" },
+      title: t("Delete card"),
+      children: (
+        <Text size="sm">{t("This card will be permanently deleted.")}</Text>
+      ),
+      labels: { confirm: t("Delete"), cancel: t("Cancel") },
       confirmProps: { color: "red" },
       onConfirm: () => {
         deleteCard.mutate(card.id);
@@ -132,7 +136,7 @@ export function CardDrawer({
         <>
           <Group justify="space-between" mb="sm">
             <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-              Card
+              {t("Card")}
             </Text>
             {!readOnly && (
               <Menu position="bottom-end" withArrow shadow="md">
@@ -147,7 +151,7 @@ export function CardDrawer({
                     leftSection={<IconTrash size={14} />}
                     onClick={confirmDelete}
                   >
-                    Delete card
+                    {t("Delete card")}
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
@@ -157,7 +161,7 @@ export function CardDrawer({
           <TextInput
             variant="unstyled"
             size="lg"
-            placeholder="Card title"
+            placeholder={t("Card title")}
             value={title}
             readOnly={readOnly}
             onChange={(e) => setTitle(e.currentTarget.value)}
@@ -170,7 +174,7 @@ export function CardDrawer({
             variant="filled"
             autosize
             minRows={2}
-            placeholder="Add a short description…"
+            placeholder={t("Add a short description…")}
             value={description}
             readOnly={readOnly}
             onChange={(e) => setDescription(e.currentTarget.value)}
@@ -188,7 +192,7 @@ export function CardDrawer({
             />
           </Box>
 
-          <Divider my="md" label="Page" labelPosition="left" />
+          <Divider my="md" label={t("Page")} labelPosition="left" />
 
           {card.pageId ? (
             <Box>
@@ -205,7 +209,7 @@ export function CardDrawer({
                     size="xs"
                     leftSection={<IconExternalLink size={14} />}
                   >
-                    Open full page
+                    {t("Open full page")}
                   </Button>
                 )}
               </Group>
@@ -233,15 +237,15 @@ export function CardDrawer({
                   value={locationMode}
                   onChange={(v) => setLocationMode(v as "existing" | "new")}
                   data={[
-                    { label: "Existing page", value: "existing" },
-                    { label: "New folder", value: "new" },
+                    { label: t("Existing page"), value: "existing" },
+                    { label: t("New folder"), value: "new" },
                   ]}
                 />
 
                 {locationMode === "new" && (
                   <TextInput
-                    label="New folder name"
-                    placeholder="e.g. Roadmap cards"
+                    label={t("New folder name")}
+                    placeholder={t("e.g. Roadmap cards")}
                     value={newFolderName}
                     onChange={(e) => setNewFolderName(e.currentTarget.value)}
                   />
@@ -253,8 +257,8 @@ export function CardDrawer({
                   onChange={setParentPageId}
                   label={
                     locationMode === "new"
-                      ? "Create folder inside (optional)"
-                      : "Location"
+                      ? t("Create folder inside (optional)")
+                      : t("Location")
                   }
                 />
               </Stack>
@@ -270,7 +274,7 @@ export function CardDrawer({
                   }
                   onClick={handleAddPage}
                 >
-                  Add page content
+                  {t("Add page content")}
                 </Button>
               </Group>
             </Box>

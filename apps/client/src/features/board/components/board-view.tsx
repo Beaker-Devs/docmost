@@ -19,6 +19,7 @@ import {
 import { byPosition, positionBetween } from "@/features/board/board.utils";
 import { Box, Button, Group, Loader, Text, TextInput } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import classes from "./board.module.css";
 import {
   useBoardQuery,
@@ -42,6 +43,7 @@ interface BoardViewProps {
 }
 
 export function BoardView({ boardId, spaceSlug, readOnly = false }: BoardViewProps) {
+  const { t } = useTranslation();
   const { data: board, isLoading } = useBoardQuery(boardId);
   const moveCard = useMoveCardMutation(boardId);
   const moveColumn = useMoveColumnMutation(boardId);
@@ -279,7 +281,7 @@ export function BoardView({ boardId, spaceSlug, readOnly = false }: BoardViewPro
                 <Box>
                   <TextInput
                     autoFocus
-                    placeholder="Column name"
+                    placeholder={t("Column name")}
                     value={newColumnName}
                     onChange={(e) => setNewColumnName(e.currentTarget.value)}
                     onKeyDown={(e) => {
@@ -290,7 +292,7 @@ export function BoardView({ boardId, spaceSlug, readOnly = false }: BoardViewPro
                   />
                   <Group mt="xs" gap="xs">
                     <Button size="xs" onMouseDown={handleAddColumn}>
-                      Add
+                      {t("Add")}
                     </Button>
                   </Group>
                 </Box>
@@ -303,7 +305,7 @@ export function BoardView({ boardId, spaceSlug, readOnly = false }: BoardViewPro
                   fullWidth
                   justify="flex-start"
                 >
-                  <Text size="sm">Add column</Text>
+                  <Text size="sm">{t("Add column")}</Text>
                 </Button>
               )}
             </div>

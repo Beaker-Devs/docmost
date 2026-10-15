@@ -2,6 +2,7 @@ import { Anchor, Breadcrumbs, Group, Title } from "@mantine/core";
 import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { IconChevronLeft } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import { useGetSpaceBySlugQuery } from "@/features/space/queries/space-query";
 import { getAppName, getSpaceUrl } from "@/lib/config";
 import { BoardView } from "@/features/board/components/board-view";
@@ -13,6 +14,7 @@ import {
 } from "@/features/space/permissions/permissions.type";
 
 export default function BoardPage() {
+  const { t } = useTranslation();
   const { spaceSlug, boardId } = useParams();
   const { data: space } = useGetSpaceBySlugQuery(spaceSlug);
   const { data: board } = useBoardQuery(boardId);
@@ -40,7 +42,7 @@ export default function BoardPage() {
           >
             <Group gap={4}>
               <IconChevronLeft size={14} />
-              Boards
+              {t("Boards")}
             </Group>
           </Anchor>
           <Title order={4}>{board?.title}</Title>

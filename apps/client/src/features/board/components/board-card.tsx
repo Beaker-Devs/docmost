@@ -8,6 +8,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import clsx from "clsx";
+import { useTranslation } from "react-i18next";
 import classes from "./board.module.css";
 import { ICard } from "@/features/board/types/board.types";
 import { useDeleteCardMutation } from "@/features/board/queries/board-query";
@@ -27,6 +28,7 @@ export function BoardCard({
   readOnly,
   onClick,
 }: BoardCardProps) {
+  const { t } = useTranslation();
   const {
     attributes,
     listeners,
@@ -81,7 +83,7 @@ export function BoardCard({
                   leftSection={<IconTrash size={14} />}
                   onClick={() => deleteCard.mutate(card.id)}
                 >
-                  Delete card
+                  {t("Delete card")}
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
@@ -117,7 +119,7 @@ export function BoardCard({
             <IconFileText
               size={15}
               className={classes.cardPageIcon}
-              title="Has page"
+              title={t("Has page")}
             />
           )}
         </Group>

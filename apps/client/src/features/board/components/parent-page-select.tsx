@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { searchPage } from "@/features/search/services/search-service";
 
 interface ParentPageSelectProps {
@@ -19,8 +20,9 @@ export function ParentPageSelect({
   spaceId,
   value,
   onChange,
-  label = "Location",
+  label,
 }: ParentPageSelectProps) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [debounced] = useDebouncedValue(search, 300);
   const [selected, setSelected] = useState<{ value: string; label: string } | null>(
@@ -47,9 +49,9 @@ export function ParentPageSelect({
 
   return (
     <Select
-      label={label}
-      placeholder="Space root"
-      description="Search a page to file this card's page under"
+      label={label ?? t("Location")}
+      placeholder={t("Space root")}
+      description={t("Search a page to file this card's page under")}
       data={options}
       value={value}
       searchable
@@ -58,10 +60,10 @@ export function ParentPageSelect({
       onSearchChange={setSearch}
       nothingFoundMessage={
         debounced.trim().length === 0
-          ? "Type to search pages"
+          ? t("Type to search pages")
           : isFetching
-            ? "Searching…"
-            : "No pages found"
+            ? t("Searching…")
+            : t("No pages found")
       }
       onChange={(val) => {
         const opt = options.find((o) => o.value === val) ?? null;

@@ -4,6 +4,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { ActionIcon, Badge, Group, Menu, Text, Textarea } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { IconDots, IconPlus, IconTrash } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 import classes from "./board.module.css";
 import { IColumn } from "@/features/board/types/board.types";
@@ -24,6 +25,7 @@ export function BoardColumn({
   readOnly,
   onAddCard,
 }: BoardColumnProps) {
+  const { t } = useTranslation();
   const {
     attributes,
     listeners,
@@ -51,17 +53,16 @@ export function BoardColumn({
 
   function confirmDeleteColumn() {
     modals.openConfirmModal({
-      title: "Delete column",
+      title: t("Delete column"),
       children: (
         <Text size="sm">
-          Delete <b>{column.name}</b>
-          {count > 0
-            ? ` and its ${count} card${count === 1 ? "" : "s"}?`
-            : "?"}{" "}
-          This cannot be undone.
+          {t(
+            'Delete the "{{name}}" column and all its cards? This cannot be undone.',
+            { name: column.name },
+          )}
         </Text>
       ),
-      labels: { confirm: "Delete", cancel: "Cancel" },
+      labels: { confirm: t("Delete"), cancel: t("Cancel") },
       confirmProps: { color: "red" },
       onConfirm: () => deleteColumn.mutate(column.id),
     });
@@ -117,7 +118,7 @@ export function BoardColumn({
                 leftSection={<IconTrash size={14} />}
                 onClick={confirmDeleteColumn}
               >
-                Delete column
+                {t("Delete column")}
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
@@ -132,7 +133,7 @@ export function BoardColumn({
             autoFocus
             autosize
             minRows={2}
-            placeholder="Card title…"
+            placeholder={t("Card title…")}
             value={title}
             onChange={(e) => setTitle(e.currentTarget.value)}
             onKeyDown={(e) => {
@@ -153,7 +154,7 @@ export function BoardColumn({
               onClick={() => setAdding(true)}
             >
               <IconPlus size={15} />
-              <span>Add card</span>
+              <span>{t("Add card")}</span>
             </button>
           )
         )}

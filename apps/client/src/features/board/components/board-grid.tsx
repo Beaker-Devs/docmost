@@ -11,6 +11,7 @@ import {
   Title,
 } from "@mantine/core";
 import { IconLayoutKanban, IconPlus } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import {
   useBoardsQuery,
   useCreateBoardMutation,
@@ -24,6 +25,7 @@ interface BoardGridProps {
 }
 
 export function BoardGrid({ spaceId, spaceSlug, canCreate }: BoardGridProps) {
+  const { t } = useTranslation();
   const { data: boards, isLoading } = useBoardsQuery(spaceId);
   const createBoard = useCreateBoardMutation();
   const [opened, setOpened] = useState(false);
@@ -46,19 +48,21 @@ export function BoardGrid({ spaceId, spaceSlug, canCreate }: BoardGridProps) {
   return (
     <>
       <Group justify="space-between" mb="lg">
-        <Title order={3}>Boards</Title>
+        <Title order={3}>{t("Boards")}</Title>
         {canCreate && (
           <Button
             leftSection={<IconPlus size={16} />}
             onClick={() => setOpened(true)}
           >
-            New board
+            {t("New board")}
           </Button>
         )}
       </Group>
 
       {!isLoading && boards?.length === 0 && (
-        <Text c="dimmed">No boards yet. Create your first kanban board.</Text>
+        <Text c="dimmed">
+          {t("No boards yet. Create your first kanban board.")}
+        </Text>
       )}
 
       <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
@@ -87,12 +91,12 @@ export function BoardGrid({ spaceId, spaceSlug, canCreate }: BoardGridProps) {
       <Modal
         opened={opened}
         onClose={() => setOpened(false)}
-        title="Create board"
+        title={t("Create board")}
         centered
       >
         <TextInput
-          label="Board title"
-          placeholder="e.g. Product Roadmap"
+          label={t("Board title")}
+          placeholder={t("e.g. Product Roadmap")}
           data-autofocus
           value={title}
           onChange={(e) => setTitle(e.currentTarget.value)}
@@ -100,10 +104,10 @@ export function BoardGrid({ spaceId, spaceSlug, canCreate }: BoardGridProps) {
         />
         <Group justify="flex-end" mt="md">
           <Button variant="default" onClick={() => setOpened(false)}>
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button onClick={handleCreate} loading={createBoard.isPending}>
-            Create
+            {t("Create")}
           </Button>
         </Group>
       </Modal>

@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Avatar, Group, Select, Text } from "@mantine/core";
+import { useTranslation } from "react-i18next";
 import { useSpaceMembersQuery } from "@/features/space/queries/space-query";
 
 interface AssigneeSelectProps {
@@ -15,6 +16,7 @@ export function AssigneeSelect({
   onChange,
   disabled,
 }: AssigneeSelectProps) {
+  const { t } = useTranslation();
   const { data } = useSpaceMembersQuery(spaceId, { limit: 100 });
 
   const users = useMemo(
@@ -37,15 +39,15 @@ export function AssigneeSelect({
 
   return (
     <Select
-      label="Assignee"
-      placeholder="Unassigned"
+      label={t("Assignee")}
+      placeholder={t("Unassigned")}
       data={options}
       value={value}
       onChange={onChange}
       clearable
       searchable
       disabled={disabled}
-      nothingFoundMessage="No members"
+      nothingFoundMessage={t("No members")}
       comboboxProps={{ withinPortal: true }}
       leftSection={
         value && userById[value] ? (
