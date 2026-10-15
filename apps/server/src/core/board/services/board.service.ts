@@ -122,6 +122,8 @@ export class BoardService {
   // ---------- cards ----------
 
   async createCard(userId: string, dto: CreateCardDto): Promise<Card> {
+    await this.assertColumnInBoard(dto.columnId, dto.boardId);
+
     const lastCard = await this.boardRepo.getLastCardInColumn(dto.columnId);
     const position = generateJitteredKeyBetween(
       lastCard?.position ?? null,
@@ -155,7 +157,26 @@ export class BoardService {
 
   async moveCard(cardId: string, columnId: string, position: string) {
     this.validatePosition(position);
+
+    const card = await this.boardRepo.findCardById(cardId);
+    if (!card) {
+      throw new NotFoundException('Card not found');
+    }
+    // the target column must belong to the same board as the card, otherwise
+    // the card would be orphaned (visible on no board)
+    await this.assertColumnInBoard(columnId, card.boardId);
+
     return this.boardRepo.updateCard({ columnId, position }, cardId);
+  }
+
+  private async assertColumnInBoard(columnId: string, boardId: string) {
+    const column = await this.boardRepo.findColumnById(columnId);
+    if (!column) {
+      throw new NotFoundException('Column not found');
+    }
+    if (column.boardId !== boardId) {
+      throw new BadRequestException('Column does not belong to this board');
+    }
   }
 
   async deleteCard(cardId: string) {

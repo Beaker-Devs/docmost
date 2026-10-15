@@ -1,4 +1,5 @@
 import {
+  QueryClient,
   useMutation,
   useQuery,
   useQueryClient,
@@ -29,12 +30,18 @@ import {
 } from "@/features/board/types/board.types";
 import { useQueryEmit } from "@/features/websocket/use-query-emit";
 
-// realtime: tell other viewers to refetch this board / the space's board list
-const boardEvent = (boardId: string) => ({
+// realtime: tell other viewers to refetch this board / the space's board list.
+// spaceId lets the WS gateway scope the broadcast to the space room.
+function spaceIdOf(queryClient: QueryClient, boardId: string): string {
+  return (
+    queryClient.getQueryData<IBoardWithData>(["board", boardId])?.spaceId ?? ""
+  );
+}
+const boardEvent = (boardId: string, spaceId: string) => ({
   operation: "invalidate" as const,
   entity: ["board"],
   id: boardId,
-  spaceId: "",
+  spaceId,
 });
 const boardsEvent = (spaceId: string) => ({
   operation: "invalidate" as const,
@@ -96,7 +103,7 @@ export function useUpdateBoardMutation() {
     mutationFn: (data) => updateBoard(data),
     onSuccess: (board) => {
       queryClient.invalidateQueries({ queryKey: ["board", board.id] });
-      emit(boardEvent(board.id));
+      emit(boardEvent(board.id, board.spaceId));
     },
   });
 }
@@ -108,7 +115,7 @@ export function useCreateColumnMutation() {
     mutationFn: (data) => createColumn(data),
     onSuccess: (col) => {
       queryClient.invalidateQueries({ queryKey: ["board", col.boardId] });
-      emit(boardEvent(col.boardId));
+      emit(boardEvent(col.boardId, spaceIdOf(queryClient, col.boardId)));
     },
   });
 }
@@ -120,7 +127,7 @@ export function useUpdateColumnMutation(boardId: string) {
     mutationFn: (data) => updateColumn(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["board", boardId] });
-      emit(boardEvent(boardId));
+      emit(boardEvent(boardId, spaceIdOf(queryClient, boardId)));
     },
   });
 }
@@ -132,7 +139,7 @@ export function useDeleteColumnMutation(boardId: string) {
     mutationFn: (columnId) => deleteColumn(columnId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["board", boardId] });
-      emit(boardEvent(boardId));
+      emit(boardEvent(boardId, spaceIdOf(queryClient, boardId)));
     },
   });
 }
@@ -144,7 +151,7 @@ export function useCreateCardMutation() {
     mutationFn: (data) => createCard(data),
     onSuccess: (card) => {
       queryClient.invalidateQueries({ queryKey: ["board", card.boardId] });
-      emit(boardEvent(card.boardId));
+      emit(boardEvent(card.boardId, spaceIdOf(queryClient, card.boardId)));
     },
     onError: () =>
       notifications.show({ message: "Failed to create card", color: "red" }),
@@ -158,7 +165,7 @@ export function useUpdateCardMutation(boardId: string) {
     mutationFn: (data) => updateCard(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["board", boardId] });
-      emit(boardEvent(boardId));
+      emit(boardEvent(boardId, spaceIdOf(queryClient, boardId)));
     },
   });
 }
@@ -170,7 +177,7 @@ export function useDeleteCardMutation(boardId: string) {
     mutationFn: (cardId) => deleteCard(cardId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["board", boardId] });
-      emit(boardEvent(boardId));
+      emit(boardEvent(boardId, spaceIdOf(queryClient, boardId)));
     },
   });
 }
@@ -186,7 +193,7 @@ export function useCreateCardPageMutation(boardId: string) {
     mutationFn: (data) => createCardPage(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["board", boardId] });
-      emit(boardEvent(boardId));
+      emit(boardEvent(boardId, spaceIdOf(queryClient, boardId)));
     },
     onError: () =>
       notifications.show({
@@ -206,7 +213,7 @@ export function useMoveCardMutation(boardId: string) {
   const emit = useQueryEmit();
   return useMutation<ICard, Error, Parameters<typeof moveCard>[0]>({
     mutationFn: (data) => moveCard(data),
-    onSuccess: () => emit(boardEvent(boardId)),
+    onSuccess: () => emit(boardEvent(boardId, spaceIdOf(queryClient, boardId))),
     onError: () => {
       notifications.show({ message: "Failed to move card", color: "red" });
       queryClient.invalidateQueries({ queryKey: ["board", boardId] });
@@ -219,7 +226,7 @@ export function useMoveColumnMutation(boardId: string) {
   const emit = useQueryEmit();
   return useMutation<IColumn, Error, Parameters<typeof moveColumn>[0]>({
     mutationFn: (data) => moveColumn(data),
-    onSuccess: () => emit(boardEvent(boardId)),
+    onSuccess: () => emit(boardEvent(boardId, spaceIdOf(queryClient, boardId))),
     onError: () => {
       queryClient.invalidateQueries({ queryKey: ["board", boardId] });
     },

@@ -15,7 +15,7 @@ export function AssigneeSelect({
   onChange,
   disabled,
 }: AssigneeSelectProps) {
-  const { data } = useSpaceMembersQuery(spaceId, { limit: 100 } as any);
+  const { data } = useSpaceMembersQuery(spaceId, { limit: 100 });
 
   const users = useMemo(
     () =>

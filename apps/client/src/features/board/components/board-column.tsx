@@ -2,6 +2,7 @@ import { ReactNode, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ActionIcon, Badge, Group, Menu, Text, Textarea } from "@mantine/core";
+import { modals } from "@mantine/modals";
 import { IconDots, IconPlus, IconTrash } from "@tabler/icons-react";
 import clsx from "clsx";
 import classes from "./board.module.css";
@@ -46,6 +47,24 @@ export function BoardColumn({
     if (value) onAddCard(value);
     setTitle("");
     setAdding(false);
+  }
+
+  function confirmDeleteColumn() {
+    modals.openConfirmModal({
+      title: "Delete column",
+      children: (
+        <Text size="sm">
+          Delete <b>{column.name}</b>
+          {count > 0
+            ? ` and its ${count} card${count === 1 ? "" : "s"}?`
+            : "?"}{" "}
+          This cannot be undone.
+        </Text>
+      ),
+      labels: { confirm: "Delete", cancel: "Cancel" },
+      confirmProps: { color: "red" },
+      onConfirm: () => deleteColumn.mutate(column.id),
+    });
   }
 
   const style = {
@@ -96,7 +115,7 @@ export function BoardColumn({
               <Menu.Item
                 color="red"
                 leftSection={<IconTrash size={14} />}
-                onClick={() => deleteColumn.mutate(column.id)}
+                onClick={confirmDeleteColumn}
               >
                 Delete column
               </Menu.Item>

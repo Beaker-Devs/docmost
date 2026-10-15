@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -35,6 +35,16 @@ import { CardDrawer } from "./card-drawer";
 type CardMap = Record<string, ICard>;
 type ColumnItems = Record<string, string[]>; // columnId -> ordered cardIds
 
+// bytewise comparison to match the server's `order by position` and the
+// codebase's sortPositionKeys — localeCompare would reorder these keys.
+const byPosition = <T extends { position: string | null }>(a: T, b: T) => {
+  const pa = a.position ?? "";
+  const pb = b.position ?? "";
+  if (pa < pb) return -1;
+  if (pa > pb) return 1;
+  return 0;
+};
+
 interface BoardViewProps {
   boardId: string;
   spaceSlug: string;
@@ -56,23 +66,25 @@ export function BoardView({ boardId, spaceSlug, readOnly = false }: BoardViewPro
   const [addingColumn, setAddingColumn] = useState(false);
   const [newColumnName, setNewColumnName] = useState("");
   const [openCardId, setOpenCardId] = useState<string | null>(null);
+  // tracks an in-progress drag so a background refetch doesn't reset state
+  // mid-drag; the card's origin lets us skip persisting a no-op drop.
+  const activeRef = useRef<{ id: string; columnId: string; index: number } | null>(
+    null,
+  );
 
   // hydrate local state whenever the server data changes
   useEffect(() => {
     if (!board) return;
-    const sortedColumns = [...board.columns].sort((a, b) =>
-      (a.position ?? "").localeCompare(b.position ?? ""),
-    );
+    if (activeRef.current) return; // don't clobber an in-progress drag
+    const sortedColumns = [...board.columns].sort(byPosition);
     const cardMap: CardMap = {};
     const colItems: ColumnItems = {};
     sortedColumns.forEach((c) => (colItems[c.id] = []));
-    [...board.cards]
-      .sort((a, b) => (a.position ?? "").localeCompare(b.position ?? ""))
-      .forEach((card) => {
-        cardMap[card.id] = card;
-        if (!colItems[card.columnId]) colItems[card.columnId] = [];
-        colItems[card.columnId].push(card.id);
-      });
+    [...board.cards].sort(byPosition).forEach((card) => {
+      cardMap[card.id] = card;
+      if (!colItems[card.columnId]) colItems[card.columnId] = [];
+      colItems[card.columnId].push(card.id);
+    });
     setColumns(sortedColumns);
     setCards(cardMap);
     setItems(colItems);
@@ -97,8 +109,18 @@ export function BoardView({ boardId, spaceSlug, readOnly = false }: BoardViewPro
 
   function handleDragStart(event: DragStartEvent) {
     const id = event.active.id as string;
+    const type =
+      (event.active.data.current?.type as "card" | "column") ?? "card";
     setActiveId(id);
-    setActiveType((event.active.data.current?.type as "card" | "column") ?? "card");
+    setActiveType(type);
+    if (type === "card") {
+      const columnId = findColumn(id);
+      activeRef.current = columnId
+        ? { id, columnId, index: items[columnId].indexOf(id) }
+        : null;
+    } else {
+      activeRef.current = { id, columnId: "", index: 0 };
+    }
   }
 
   function handleDragOver(event: DragOverEvent) {
@@ -176,6 +198,13 @@ export function BoardView({ boardId, spaceSlug, readOnly = false }: BoardViewPro
     }
 
     const idx = targetItems.indexOf(cardId);
+
+    // dropped back where it started — nothing to persist
+    const origin = activeRef.current;
+    if (origin && origin.columnId === targetColumn && origin.index === idx) {
+      return;
+    }
+
     const prevCard = idx > 0 ? cards[targetItems[idx - 1]] : null;
     const nextCard =
       idx < targetItems.length - 1 ? cards[targetItems[idx + 1]] : null;
@@ -203,6 +232,7 @@ export function BoardView({ boardId, spaceSlug, readOnly = false }: BoardViewPro
     setActiveType(null);
     if (type === "column") handleColumnDragEnd(event);
     else handleCardDragEnd(event);
+    activeRef.current = null;
   }
 
   function handleAddColumn() {
