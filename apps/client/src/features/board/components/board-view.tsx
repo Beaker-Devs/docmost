@@ -16,7 +16,7 @@ import {
   horizontalListSortingStrategy,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { generateJitteredKeyBetween } from "fractional-indexing-jittered";
+import { byPosition, positionBetween } from "@/features/board/board.utils";
 import { Box, Button, Group, Loader, Text, TextInput } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import classes from "./board.module.css";
@@ -34,16 +34,6 @@ import { CardDrawer } from "./card-drawer";
 
 type CardMap = Record<string, ICard>;
 type ColumnItems = Record<string, string[]>; // columnId -> ordered cardIds
-
-// bytewise comparison to match the server's `order by position` and the
-// codebase's sortPositionKeys — localeCompare would reorder these keys.
-const byPosition = <T extends { position: string | null }>(a: T, b: T) => {
-  const pa = a.position ?? "";
-  const pb = b.position ?? "";
-  if (pa < pb) return -1;
-  if (pa > pb) return 1;
-  return 0;
-};
 
 interface BoardViewProps {
   boardId: string;
@@ -164,15 +154,10 @@ export function BoardView({ boardId, spaceSlug, readOnly = false }: BoardViewPro
     const prevCol = idx > 0 ? reordered[idx - 1] : null;
     const nextCol = idx < reordered.length - 1 ? reordered[idx + 1] : null;
 
-    let position: string;
-    try {
-      position = generateJitteredKeyBetween(
-        prevCol?.position ?? null,
-        nextCol?.position ?? null,
-      );
-    } catch {
-      position = generateJitteredKeyBetween(prevCol?.position ?? null, null);
-    }
+    const position = positionBetween(
+      prevCol?.position ?? null,
+      nextCol?.position ?? null,
+    );
     moveColumn.mutate({ columnId: active.id as string, position });
   }
 
@@ -209,15 +194,10 @@ export function BoardView({ boardId, spaceSlug, readOnly = false }: BoardViewPro
     const nextCard =
       idx < targetItems.length - 1 ? cards[targetItems[idx + 1]] : null;
 
-    let position: string;
-    try {
-      position = generateJitteredKeyBetween(
-        prevCard?.position ?? null,
-        nextCard?.position ?? null,
-      );
-    } catch {
-      position = generateJitteredKeyBetween(prevCard?.position ?? null, null);
-    }
+    const position = positionBetween(
+      prevCard?.position ?? null,
+      nextCard?.position ?? null,
+    );
 
     setCards((prev) => ({
       ...prev,
