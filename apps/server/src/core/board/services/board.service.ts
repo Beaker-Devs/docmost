@@ -9,7 +9,7 @@ import { CreateBoardDto } from '../dto/create-board.dto';
 import { UpdateBoardDto } from '../dto/update-board.dto';
 import { CreateColumnDto, UpdateColumnDto } from '../dto/column.dto';
 import { CreateCardDto, UpdateCardDto } from '../dto/card.dto';
-import { Board, Card } from '@docmost/db/types/entity.types';
+import { Board, Card, UpdatableCard } from '@docmost/db/types/entity.types';
 import { PageService } from '../../page/services/page.service';
 
 const DEFAULT_COLUMNS = [
@@ -139,16 +139,18 @@ export class BoardService {
   }
 
   async updateCard(dto: UpdateCardDto) {
-    return this.boardRepo.updateCard(
-      {
-        title: dto.title,
-        description: dto.description,
-        assigneeId: dto.assigneeId,
-        dueDate: dto.dueDate ? new Date(dto.dueDate) : dto.dueDate,
-        labels: dto.labels,
-      },
-      dto.cardId,
-    );
+    // only touch fields that were actually provided, so a title edit doesn't
+    // wipe the assignee/description/etc.
+    const patch: UpdatableCard = {};
+    if (dto.title !== undefined) patch.title = dto.title;
+    if (dto.description !== undefined) patch.description = dto.description;
+    if (dto.assigneeId !== undefined) patch.assigneeId = dto.assigneeId;
+    if (dto.dueDate !== undefined) {
+      patch.dueDate = dto.dueDate ? new Date(dto.dueDate) : null;
+    }
+    if (dto.labels !== undefined) patch.labels = dto.labels;
+
+    return this.boardRepo.updateCard(patch, dto.cardId);
   }
 
   async moveCard(cardId: string, columnId: string, position: string) {

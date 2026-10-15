@@ -32,6 +32,7 @@ import { usePageQuery } from "@/features/page/queries/page-query";
 import PageEditor from "@/features/editor/page-editor";
 import { buildPageUrl } from "@/features/page/page.utils";
 import { ParentPageSelect } from "./parent-page-select";
+import { AssigneeSelect } from "./assignee-select";
 import classes from "./board.module.css";
 
 interface CardDrawerProps {
@@ -175,6 +176,17 @@ export function CardDrawer({
             onChange={(e) => setDescription(e.currentTarget.value)}
             onBlur={saveDescription}
           />
+
+          <Box mt="md">
+            <AssigneeSelect
+              spaceId={spaceId}
+              value={card.assigneeId}
+              disabled={readOnly}
+              onChange={(userId) =>
+                updateCard.mutate({ cardId: card.id, assigneeId: userId })
+              }
+            />
+          </Box>
 
           <Divider my="md" label="Page" labelPosition="left" />
 
