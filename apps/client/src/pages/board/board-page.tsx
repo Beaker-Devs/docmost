@@ -47,7 +47,13 @@ export default function BoardPage() {
         </Breadcrumbs>
       </Group>
 
-      {boardId && <BoardView boardId={boardId} readOnly={readOnly} />}
+      {boardId && (
+        <BoardView
+          boardId={boardId}
+          spaceSlug={spaceSlug}
+          readOnly={readOnly}
+        />
+      )}
     </>
   );
 }

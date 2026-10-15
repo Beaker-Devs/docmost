@@ -8,6 +8,7 @@ import { notifications } from "@mantine/notifications";
 import {
   createBoard,
   createCard,
+  createCardPage,
   createColumn,
   deleteBoard,
   deleteCard,
@@ -138,6 +139,21 @@ export function useDeleteCardMutation(boardId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["board", boardId] });
     },
+  });
+}
+
+export function useCreateCardPageMutation(boardId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<ICard, Error, string>({
+    mutationFn: (cardId) => createCardPage(cardId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["board", boardId] });
+    },
+    onError: () =>
+      notifications.show({
+        message: "Failed to create page for card",
+        color: "red",
+      }),
   });
 }
 

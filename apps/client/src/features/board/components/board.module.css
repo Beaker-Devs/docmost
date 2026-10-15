@@ -28,6 +28,25 @@
     light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
 }
 
+.columnHandle {
+  cursor: grab;
+}
+
+.columnDragging {
+  opacity: 0.5;
+}
+
+.columnOverlay {
+  width: 288px;
+  padding: 10px 12px;
+  background-color: light-dark(white, var(--mantine-color-dark-6));
+  border: 1px solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  border-radius: var(--mantine-radius-md);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  cursor: grabbing;
+}
+
 .colDot {
   display: inline-block;
   width: 10px;
@@ -117,4 +136,22 @@
   width: 288px;
   min-width: 288px;
   padding-top: 2px;
+}
+
+.cardPageIcon {
+  color: var(--mantine-color-dimmed);
+}
+
+.drawerTitle {
+  font-size: var(--mantine-font-size-xl);
+  font-weight: 600;
+}
+
+.drawerEditor {
+  margin: 0 -16px;
+}
+
+.drawerEditor :global(.mantine-Container-root) {
+  padding-left: 0;
+  padding-right: 0;
 }

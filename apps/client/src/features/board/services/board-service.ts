@@ -91,3 +91,8 @@ export async function moveCard(data: IMoveCard): Promise<ICard> {
 export async function deleteCard(cardId: string): Promise<void> {
   await api.post("/boards/card/delete", { cardId });
 }
+
+export async function createCardPage(cardId: string): Promise<ICard> {
+  const req = await api.post("/boards/card/create-page", { cardId });
+  return req.data;
+}

@@ -179,4 +179,12 @@ export class BoardController {
     await this.assertBoardAbility(user, boardId, SpaceCaslAction.Edit);
     await this.boardService.deleteCard(dto.cardId);
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('/card/create-page')
+  async createCardPage(@Body() dto: CardIdDto, @AuthUser() user: User) {
+    const boardId = await this.boardIdForCard(dto.cardId);
+    await this.assertBoardAbility(user, boardId, SpaceCaslAction.Edit);
+    return this.boardService.createCardPage(user.id, dto.cardId);
+  }
 }

@@ -1,7 +1,12 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { ActionIcon, Avatar, Group, Menu, Text } from "@mantine/core";
-import { IconDots, IconGripVertical, IconTrash } from "@tabler/icons-react";
+import {
+  IconDots,
+  IconFileText,
+  IconGripVertical,
+  IconTrash,
+} from "@tabler/icons-react";
 import clsx from "clsx";
 import classes from "./board.module.css";
 import { ICard } from "@/features/board/types/board.types";
@@ -12,9 +17,16 @@ interface BoardCardProps {
   boardId: string;
   overlay?: boolean;
   readOnly?: boolean;
+  onClick?: () => void;
 }
 
-export function BoardCard({ card, boardId, overlay, readOnly }: BoardCardProps) {
+export function BoardCard({
+  card,
+  boardId,
+  overlay,
+  readOnly,
+  onClick,
+}: BoardCardProps) {
   const {
     attributes,
     listeners,
@@ -44,6 +56,7 @@ export function BoardCard({ card, boardId, overlay, readOnly }: BoardCardProps) 
       )}
       {...(readOnly ? {} : attributes)}
       {...(readOnly ? {} : listeners)}
+      onClick={overlay ? undefined : onClick}
     >
       <Group justify="space-between" wrap="nowrap" align="flex-start" gap={4}>
         <Text size="sm" className={classes.cardTitle}>
@@ -86,14 +99,27 @@ export function BoardCard({ card, boardId, overlay, readOnly }: BoardCardProps) 
         )}
       </Group>
 
-      {card.assignee && (
-        <Group mt={8} gap="xs">
-          <Avatar size={20} radius="xl" src={card.assignee.avatarUrl}>
-            {card.assignee.name?.charAt(0)}
-          </Avatar>
-          <Text size="xs" c="dimmed">
-            {card.assignee.name}
-          </Text>
+      {(card.pageId || card.assignee) && (
+        <Group mt={8} gap="xs" justify="space-between">
+          {card.assignee ? (
+            <Group gap={6} wrap="nowrap">
+              <Avatar size={20} radius="xl" src={card.assignee.avatarUrl}>
+                {card.assignee.name?.charAt(0)}
+              </Avatar>
+              <Text size="xs" c="dimmed">
+                {card.assignee.name}
+              </Text>
+            </Group>
+          ) : (
+            <span />
+          )}
+          {card.pageId && (
+            <IconFileText
+              size={15}
+              className={classes.cardPageIcon}
+              title="Has page"
+            />
+          )}
         </Group>
       )}
     </div>

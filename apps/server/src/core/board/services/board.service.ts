@@ -10,6 +10,7 @@ import { UpdateBoardDto } from '../dto/update-board.dto';
 import { CreateColumnDto, UpdateColumnDto } from '../dto/column.dto';
 import { CreateCardDto, UpdateCardDto } from '../dto/card.dto';
 import { Board, Card } from '@docmost/db/types/entity.types';
+import { PageService } from '../../page/services/page.service';
 
 const DEFAULT_COLUMNS = [
   { name: 'To do', color: '#868e96' },
@@ -19,7 +20,10 @@ const DEFAULT_COLUMNS = [
 
 @Injectable()
 export class BoardService {
-  constructor(private readonly boardRepo: BoardRepo) {}
+  constructor(
+    private readonly boardRepo: BoardRepo,
+    private readonly pageService: PageService,
+  ) {}
 
   // ---------- boards ----------
 
@@ -154,6 +158,32 @@ export class BoardService {
 
   async deleteCard(cardId: string) {
     await this.boardRepo.deleteCard(cardId);
+  }
+
+  /**
+   * Back a card with a full Docmost page so it gets the rich collaborative
+   * editor. Creates the page in the board's space and links it to the card.
+   */
+  async createCardPage(userId: string, cardId: string): Promise<Card> {
+    const card = await this.boardRepo.findCardById(cardId);
+    if (!card) {
+      throw new NotFoundException('Card not found');
+    }
+    if (card.pageId) {
+      return card;
+    }
+
+    const board = await this.boardRepo.findById(card.boardId);
+    if (!board) {
+      throw new NotFoundException('Board not found');
+    }
+
+    const page = await this.pageService.create(userId, board.workspaceId, {
+      title: card.title,
+      spaceId: board.spaceId,
+    });
+
+    return this.boardRepo.updateCard({ pageId: page.id }, cardId);
   }
 
   private validatePosition(position: string) {
