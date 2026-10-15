@@ -56,3 +56,12 @@ export class MoveCardDto {
   @IsString()
   position: string;
 }
+
+export class CreateCardPageDto {
+  @IsUUID()
+  cardId: string;
+
+  @IsOptional()
+  @IsUUID()
+  parentPageId?: string;
+}

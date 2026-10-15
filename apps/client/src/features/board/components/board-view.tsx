@@ -317,6 +317,7 @@ export function BoardView({ boardId, spaceSlug, readOnly = false }: BoardViewPro
         cardId={openCardId}
         card={openCardId ? cards[openCardId] : null}
         boardId={boardId}
+        spaceId={board?.spaceId ?? ""}
         spaceSlug={spaceSlug}
         readOnly={readOnly}
         onClose={() => setOpenCardId(null)}

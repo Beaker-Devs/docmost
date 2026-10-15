@@ -29,12 +29,14 @@ import {
 import { usePageQuery } from "@/features/page/queries/page-query";
 import PageEditor from "@/features/editor/page-editor";
 import { buildPageUrl } from "@/features/page/page.utils";
+import { ParentPageSelect } from "./parent-page-select";
 import classes from "./board.module.css";
 
 interface CardDrawerProps {
   cardId: string | null;
   card: ICard | null;
   boardId: string;
+  spaceId: string;
   spaceSlug: string;
   readOnly?: boolean;
   onClose: () => void;
@@ -44,6 +46,7 @@ export function CardDrawer({
   cardId,
   card,
   boardId,
+  spaceId,
   spaceSlug,
   readOnly,
   onClose,
@@ -55,10 +58,12 @@ export function CardDrawer({
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [parentPageId, setParentPageId] = useState<string | null>(null);
 
   useEffect(() => {
     setTitle(card?.title ?? "");
     setDescription(card?.description ?? "");
+    setParentPageId(null);
   }, [card?.id]);
 
   const { data: page, isLoading: pageLoading } = usePageQuery({
@@ -189,17 +194,29 @@ export function CardDrawer({
               )}
             </Box>
           ) : (
-            <Group justify="center" py="lg">
-              <Button
-                variant="light"
-                leftSection={<IconFilePlus size={16} />}
-                loading={createCardPage.isPending}
-                disabled={readOnly}
-                onClick={() => createCardPage.mutate(card.id)}
-              >
-                Add page content
-              </Button>
-            </Group>
+            <Box py="sm">
+              <ParentPageSelect
+                spaceId={spaceId}
+                value={parentPageId}
+                onChange={setParentPageId}
+              />
+              <Group justify="center" mt="md">
+                <Button
+                  variant="light"
+                  leftSection={<IconFilePlus size={16} />}
+                  loading={createCardPage.isPending}
+                  disabled={readOnly}
+                  onClick={() =>
+                    createCardPage.mutate({
+                      cardId: card.id,
+                      parentPageId: parentPageId ?? undefined,
+                    })
+                  }
+                >
+                  Add page content
+                </Button>
+              </Group>
+            </Box>
           )}
         </>
       )}

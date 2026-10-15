@@ -23,7 +23,12 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { BoardIdDto, CardIdDto, ColumnIdDto, SpaceIdDto } from './dto/board.dto';
 import { CreateColumnDto, MoveColumnDto, UpdateColumnDto } from './dto/column.dto';
-import { CreateCardDto, MoveCardDto, UpdateCardDto } from './dto/card.dto';
+import {
+  CreateCardDto,
+  CreateCardPageDto,
+  MoveCardDto,
+  UpdateCardDto,
+} from './dto/card.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('boards')
@@ -182,9 +187,16 @@ export class BoardController {
 
   @HttpCode(HttpStatus.OK)
   @Post('/card/create-page')
-  async createCardPage(@Body() dto: CardIdDto, @AuthUser() user: User) {
+  async createCardPage(
+    @Body() dto: CreateCardPageDto,
+    @AuthUser() user: User,
+  ) {
     const boardId = await this.boardIdForCard(dto.cardId);
     await this.assertBoardAbility(user, boardId, SpaceCaslAction.Edit);
-    return this.boardService.createCardPage(user.id, dto.cardId);
+    return this.boardService.createCardPage(
+      user.id,
+      dto.cardId,
+      dto.parentPageId,
+    );
   }
 }

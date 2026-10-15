@@ -164,7 +164,11 @@ export class BoardService {
    * Back a card with a full Docmost page so it gets the rich collaborative
    * editor. Creates the page in the board's space and links it to the card.
    */
-  async createCardPage(userId: string, cardId: string): Promise<Card> {
+  async createCardPage(
+    userId: string,
+    cardId: string,
+    parentPageId?: string,
+  ): Promise<Card> {
     const card = await this.boardRepo.findCardById(cardId);
     if (!card) {
       throw new NotFoundException('Card not found');
@@ -178,9 +182,12 @@ export class BoardService {
       throw new NotFoundException('Board not found');
     }
 
+    // PageService.create validates that parentPageId (when given) belongs to
+    // the same space, so a card page can only be filed within the board's space.
     const page = await this.pageService.create(userId, board.workspaceId, {
       title: card.title,
       spaceId: board.spaceId,
+      parentPageId,
     });
 
     return this.boardRepo.updateCard({ pageId: page.id }, cardId);

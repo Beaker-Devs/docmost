@@ -144,8 +144,13 @@ export function useDeleteCardMutation(boardId: string) {
 
 export function useCreateCardPageMutation(boardId: string) {
   const queryClient = useQueryClient();
-  return useMutation<ICard, Error, string>({
-    mutationFn: (cardId) => createCardPage(cardId),
+  return useMutation<
+    ICard,
+    Error,
+    { cardId: string; parentPageId?: string }
+  >({
+    mutationFn: ({ cardId, parentPageId }) =>
+      createCardPage(cardId, parentPageId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["board", boardId] });
     },
