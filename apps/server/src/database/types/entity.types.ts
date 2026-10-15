@@ -17,6 +17,9 @@ import {
   AuthProviders,
   AuthAccounts,
   Shares,
+  Boards,
+  BoardColumns,
+  Cards,
 } from './db';
 
 // Workspace
@@ -107,3 +110,18 @@ export type UpdatableAuthAccount = Updateable<Omit<AuthAccounts, 'id'>>;
 export type Share = Selectable<Shares>;
 export type InsertableShare = Insertable<Shares>;
 export type UpdatableShare = Updateable<Omit<Shares, 'id'>>;
+
+// Board
+export type Board = Selectable<Boards>;
+export type InsertableBoard = Insertable<Boards>;
+export type UpdatableBoard = Updateable<Omit<Boards, 'id'>>;
+
+// BoardColumn
+export type BoardColumn = Selectable<BoardColumns>;
+export type InsertableBoardColumn = Insertable<BoardColumns>;
+export type UpdatableBoardColumn = Updateable<Omit<BoardColumns, 'id'>>;
+
+// Card
+export type Card = Selectable<Cards>;
+export type InsertableCard = Insertable<Cards>;
+export type UpdatableCard = Updateable<Omit<Cards, 'id'>>;

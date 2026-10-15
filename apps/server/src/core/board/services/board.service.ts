@@ -1,0 +1,166 @@
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { BoardRepo } from '@docmost/db/repos/board/board.repo';
+import { generateJitteredKeyBetween } from 'fractional-indexing-jittered';
+import { CreateBoardDto } from '../dto/create-board.dto';
+import { UpdateBoardDto } from '../dto/update-board.dto';
+import { CreateColumnDto, UpdateColumnDto } from '../dto/column.dto';
+import { CreateCardDto, UpdateCardDto } from '../dto/card.dto';
+import { Board, Card } from '@docmost/db/types/entity.types';
+
+const DEFAULT_COLUMNS = [
+  { name: 'To do', color: '#868e96' },
+  { name: 'In progress', color: '#4c6ef5' },
+  { name: 'Done', color: '#2f9e44' },
+];
+
+@Injectable()
+export class BoardService {
+  constructor(private readonly boardRepo: BoardRepo) {}
+
+  // ---------- boards ----------
+
+  async getBoardsInSpace(spaceId: string) {
+    return this.boardRepo.getBoardsInSpace(spaceId);
+  }
+
+  async getBoardWithData(boardId: string) {
+    const board = await this.boardRepo.findById(boardId);
+    if (!board) {
+      throw new NotFoundException('Board not found');
+    }
+
+    const [columns, cards] = await Promise.all([
+      this.boardRepo.getColumns(boardId),
+      this.boardRepo.getCards(boardId),
+    ]);
+
+    return { ...board, columns, cards };
+  }
+
+  async createBoard(
+    userId: string,
+    workspaceId: string,
+    dto: CreateBoardDto,
+  ): Promise<Board> {
+    const board = await this.boardRepo.insertBoard({
+      title: dto.title,
+      description: dto.description,
+      icon: dto.icon,
+      spaceId: dto.spaceId,
+      workspaceId,
+      creatorId: userId,
+    });
+
+    // seed default columns
+    let prevPosition: string | null = null;
+    for (const col of DEFAULT_COLUMNS) {
+      const position = generateJitteredKeyBetween(prevPosition, null);
+      await this.boardRepo.insertColumn({
+        boardId: board.id,
+        name: col.name,
+        color: col.color,
+        position,
+      });
+      prevPosition = position;
+    }
+
+    return board;
+  }
+
+  async updateBoard(boardId: string, dto: UpdateBoardDto) {
+    return this.boardRepo.updateBoard(
+      { title: dto.title, description: dto.description, icon: dto.icon },
+      boardId,
+    );
+  }
+
+  async deleteBoard(boardId: string) {
+    await this.boardRepo.softDeleteBoard(boardId);
+  }
+
+  // ---------- columns ----------
+
+  async createColumn(dto: CreateColumnDto) {
+    const lastColumn = await this.boardRepo.getLastColumn(dto.boardId);
+    const position = generateJitteredKeyBetween(
+      lastColumn?.position ?? null,
+      null,
+    );
+
+    return this.boardRepo.insertColumn({
+      boardId: dto.boardId,
+      name: dto.name,
+      color: dto.color,
+      position,
+    });
+  }
+
+  async updateColumn(dto: UpdateColumnDto) {
+    return this.boardRepo.updateColumn(
+      { name: dto.name, color: dto.color },
+      dto.columnId,
+    );
+  }
+
+  async moveColumn(columnId: string, position: string) {
+    this.validatePosition(position);
+    return this.boardRepo.updateColumn({ position }, columnId);
+  }
+
+  async deleteColumn(columnId: string) {
+    await this.boardRepo.deleteColumn(columnId);
+  }
+
+  // ---------- cards ----------
+
+  async createCard(userId: string, dto: CreateCardDto): Promise<Card> {
+    const lastCard = await this.boardRepo.getLastCardInColumn(dto.columnId);
+    const position = generateJitteredKeyBetween(
+      lastCard?.position ?? null,
+      null,
+    );
+
+    return this.boardRepo.insertCard({
+      boardId: dto.boardId,
+      columnId: dto.columnId,
+      title: dto.title,
+      description: dto.description,
+      position,
+      creatorId: userId,
+    });
+  }
+
+  async updateCard(dto: UpdateCardDto) {
+    return this.boardRepo.updateCard(
+      {
+        title: dto.title,
+        description: dto.description,
+        assigneeId: dto.assigneeId,
+        dueDate: dto.dueDate ? new Date(dto.dueDate) : dto.dueDate,
+        labels: dto.labels,
+      },
+      dto.cardId,
+    );
+  }
+
+  async moveCard(cardId: string, columnId: string, position: string) {
+    this.validatePosition(position);
+    return this.boardRepo.updateCard({ columnId, position }, cardId);
+  }
+
+  async deleteCard(cardId: string) {
+    await this.boardRepo.deleteCard(cardId);
+  }
+
+  private validatePosition(position: string) {
+    try {
+      generateJitteredKeyBetween(position, null);
+    } catch {
+      throw new BadRequestException('Invalid position');
+    }
+  }
+}

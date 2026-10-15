@@ -107,6 +107,45 @@ export interface Billing {
   workspaceId: string;
 }
 
+export interface BoardColumns {
+  boardId: string;
+  color: string | null;
+  createdAt: Generated<Timestamp>;
+  id: Generated<string>;
+  name: string;
+  position: string | null;
+  updatedAt: Generated<Timestamp>;
+}
+
+export interface Boards {
+  createdAt: Generated<Timestamp>;
+  creatorId: string | null;
+  deletedAt: Timestamp | null;
+  description: string | null;
+  icon: string | null;
+  id: Generated<string>;
+  spaceId: string;
+  title: string;
+  updatedAt: Generated<Timestamp>;
+  workspaceId: string;
+}
+
+export interface Cards {
+  assigneeId: string | null;
+  boardId: string;
+  columnId: string;
+  createdAt: Generated<Timestamp>;
+  creatorId: string | null;
+  description: string | null;
+  dueDate: Timestamp | null;
+  id: Generated<string>;
+  labels: Json | null;
+  pageId: string | null;
+  position: string | null;
+  title: string;
+  updatedAt: Generated<Timestamp>;
+}
+
 export interface Comments {
   content: Json | null;
   createdAt: Generated<Timestamp>;
@@ -297,6 +336,9 @@ export interface DB {
   authProviders: AuthProviders;
   backlinks: Backlinks;
   billing: Billing;
+  boardColumns: BoardColumns;
+  boards: Boards;
+  cards: Cards;
   comments: Comments;
   groups: Groups;
   groupUsers: GroupUsers;
