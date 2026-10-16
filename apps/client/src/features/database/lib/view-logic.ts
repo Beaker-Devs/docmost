@@ -83,13 +83,8 @@ export function applyFilters(
   );
 }
 
-function compare(a: any, b: any, type: IDatabaseField["type"]): number {
-  const aEmpty = isEmpty(a);
-  const bEmpty = isEmpty(b);
-  if (aEmpty && bEmpty) return 0;
-  if (aEmpty) return 1; // empties sort last
-  if (bEmpty) return -1;
-
+/** Compare two non-empty values of a given type. */
+function compareNonEmpty(a: any, b: any, type: IDatabaseField["type"]): number {
   if (type === "number") return Number(a) - Number(b);
   if (type === "checkbox") return (a === true ? 1 : 0) - (b === true ? 1 : 0);
   if (type === "date") {
@@ -98,7 +93,10 @@ function compare(a: any, b: any, type: IDatabaseField["type"]): number {
   return String(a).localeCompare(String(b), undefined, { sensitivity: "base" });
 }
 
-/** Apply multi-key sort (stable). */
+/**
+ * Apply multi-key sort (stable). Empty cells always sort last, regardless of
+ * the sort direction.
+ */
 export function applySorts(
   rows: IDatabaseRow[],
   sorts: ISort[],
@@ -110,11 +108,14 @@ export function applySorts(
     for (const s of sorts) {
       const field = fieldById.get(s.fieldId);
       if (!field) continue;
-      const c = compare(
-        cellValue(r1, s.fieldId),
-        cellValue(r2, s.fieldId),
-        field.type,
-      );
+      const a = cellValue(r1, s.fieldId);
+      const b = cellValue(r2, s.fieldId);
+      const aEmpty = isEmpty(a);
+      const bEmpty = isEmpty(b);
+      if (aEmpty && bEmpty) continue;
+      if (aEmpty) return 1; // empties last, independent of direction
+      if (bEmpty) return -1;
+      const c = compareNonEmpty(a, b, field.type);
       if (c !== 0) return s.direction === "asc" ? c : -c;
     }
     return 0;

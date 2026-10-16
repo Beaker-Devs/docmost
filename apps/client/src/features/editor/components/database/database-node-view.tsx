@@ -38,7 +38,6 @@ export default function DatabaseNodeView(props: NodeViewProps) {
     if (!databaseId && editable && page?.spaceId && !creatingRef.current) {
       create();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [databaseId, editable, page?.spaceId]);
 
   return (
