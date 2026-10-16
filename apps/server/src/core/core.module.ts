@@ -18,6 +18,7 @@ import { DomainMiddleware } from '../common/middlewares/domain.middleware';
 import { ShareModule } from './share/share.module';
 import { BoardModule } from './board/board.module';
 import { AuditModule } from './audit/audit.module';
+import { DatabaseFeatureModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AuditModule } from './audit/audit.module';
     ShareModule,
     BoardModule,
     AuditModule,
+    DatabaseFeatureModule,
   ],
 })
 export class CoreModule implements NestModule {

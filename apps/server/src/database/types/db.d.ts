@@ -159,6 +159,53 @@ export interface Cards {
   updatedAt: Generated<Timestamp>;
 }
 
+export interface Databases {
+  createdAt: Generated<Timestamp>;
+  creatorId: string | null;
+  deletedAt: Timestamp | null;
+  icon: string | null;
+  id: Generated<string>;
+  spaceId: string;
+  title: string;
+  updatedAt: Generated<Timestamp>;
+  workspaceId: string;
+}
+
+export interface DatabaseFields {
+  config: Generated<Json | null>;
+  createdAt: Generated<Timestamp>;
+  databaseId: string;
+  id: Generated<string>;
+  name: string;
+  position: string | null;
+  type: string;
+  updatedAt: Generated<Timestamp>;
+}
+
+export interface DatabaseRows {
+  cells: Generated<Json>;
+  createdAt: Generated<Timestamp>;
+  creatorId: string | null;
+  databaseId: string;
+  id: Generated<string>;
+  position: string | null;
+  updatedAt: Generated<Timestamp>;
+}
+
+export interface DatabaseViews {
+  config: Generated<Json | null>;
+  createdAt: Generated<Timestamp>;
+  databaseId: string;
+  filters: Generated<Json>;
+  groupBy: string | null;
+  id: Generated<string>;
+  name: string;
+  position: string | null;
+  sorts: Generated<Json>;
+  type: Generated<string>;
+  updatedAt: Generated<Timestamp>;
+}
+
 export interface Comments {
   content: Json | null;
   createdAt: Generated<Timestamp>;
@@ -354,6 +401,10 @@ export interface DB {
   boards: Boards;
   cards: Cards;
   comments: Comments;
+  databases: Databases;
+  databaseFields: DatabaseFields;
+  databaseRows: DatabaseRows;
+  databaseViews: DatabaseViews;
   groups: Groups;
   groupUsers: GroupUsers;
   pageHistory: PageHistory;

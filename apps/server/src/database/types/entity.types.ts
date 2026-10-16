@@ -20,6 +20,10 @@ import {
   Boards,
   BoardColumns,
   Cards,
+  Databases,
+  DatabaseFields,
+  DatabaseRows,
+  DatabaseViews,
   AuditLogs,
 } from './db';
 
@@ -126,6 +130,23 @@ export type UpdatableBoardColumn = Updateable<Omit<BoardColumns, 'id'>>;
 export type Card = Selectable<Cards>;
 export type InsertableCard = Insertable<Cards>;
 export type UpdatableCard = Updateable<Omit<Cards, 'id'>>;
+
+// Database (Notion-style)
+export type Database = Selectable<Databases>;
+export type InsertableDatabase = Insertable<Databases>;
+export type UpdatableDatabase = Updateable<Omit<Databases, 'id'>>;
+
+export type DatabaseField = Selectable<DatabaseFields>;
+export type InsertableDatabaseField = Insertable<DatabaseFields>;
+export type UpdatableDatabaseField = Updateable<Omit<DatabaseFields, 'id'>>;
+
+export type DatabaseRow = Selectable<DatabaseRows>;
+export type InsertableDatabaseRow = Insertable<DatabaseRows>;
+export type UpdatableDatabaseRow = Updateable<Omit<DatabaseRows, 'id'>>;
+
+export type DatabaseView = Selectable<DatabaseViews>;
+export type InsertableDatabaseView = Insertable<DatabaseViews>;
+export type UpdatableDatabaseView = Updateable<Omit<DatabaseViews, 'id'>>;
 
 // AuditLog
 export type AuditLog = Selectable<AuditLogs>;
