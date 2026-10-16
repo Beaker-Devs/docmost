@@ -17,7 +17,7 @@ import { CaslModule } from './casl/casl.module';
 import { DomainMiddleware } from '../common/middlewares/domain.middleware';
 import { ShareModule } from './share/share.module';
 import { BoardModule } from './board/board.module';
-import { AuditModule } from '../ee/audit/audit.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
