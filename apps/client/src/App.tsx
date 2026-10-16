@@ -12,6 +12,8 @@ import Spaces from "@/pages/settings/space/spaces.tsx";
 import { Error404 } from "@/components/ui/error-404.tsx";
 import AccountPreferences from "@/pages/settings/account/account-preferences.tsx";
 import SpaceHome from "@/pages/space/space-home.tsx";
+import SpaceBoards from "@/pages/board/space-boards.tsx";
+import BoardPage from "@/pages/board/board-page.tsx";
 import PageRedirect from "@/pages/page/page-redirect.tsx";
 import Layout from "@/components/layouts/global/layout.tsx";
 import { ErrorBoundary } from "react-error-boundary";
@@ -68,6 +70,11 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path={"/home"} element={<Home />} />
           <Route path={"/s/:spaceSlug"} element={<SpaceHome />} />
+          <Route path={"/s/:spaceSlug/boards"} element={<SpaceBoards />} />
+          <Route
+            path={"/s/:spaceSlug/boards/:boardId"}
+            element={<BoardPage />}
+          />
           <Route
             path={"/s/:spaceSlug/p/:pageSlug"}
             element={
