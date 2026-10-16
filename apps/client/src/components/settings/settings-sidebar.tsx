@@ -90,7 +90,6 @@ const groupedData: DataGroup[] = [
         label: "Audit log",
         icon: IconHistory,
         path: "/settings/audit-logs",
-        isEnterprise: true,
         isAdmin: true,
       },
       { label: "Groups", icon: IconUsersGroup, path: "/settings/groups" },

@@ -18,9 +18,9 @@ import { getAppName } from "@/lib/config.ts";
 import {
   useAuditActionsQuery,
   useAuditLogsQuery,
-} from "@/ee/audit/queries/audit-query.ts";
-import { auditActionLabel } from "@/ee/audit/audit-labels.ts";
-import { IAuditLog } from "@/ee/audit/types/audit.types.ts";
+} from "@/features/audit/queries/audit-query.ts";
+import { auditActionLabel } from "@/features/audit/audit-labels.ts";
+import { IAuditLog } from "@/features/audit/types/audit.types.ts";
 import { useWorkspaceMembersQuery } from "@/features/workspace/queries/workspace-query.ts";
 
 function resourceSummary(log: IAuditLog): string {

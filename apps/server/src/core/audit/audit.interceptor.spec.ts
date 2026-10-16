@@ -79,9 +79,9 @@ describe('AuditInterceptor', () => {
     expect(service.record).not.toHaveBeenCalled();
   });
 
-  it('does not record when the workspace is unlicensed', () => {
+  it('records regardless of license (available on install)', () => {
     run(interceptor, req({ raw: { workspace: { id: 'w1', licenseKey: null } } }));
-    expect(service.record).not.toHaveBeenCalled();
+    expect(service.record).toHaveBeenCalledTimes(1);
   });
 
   it('prefers the resourceId field from the body when present', () => {

@@ -28,11 +28,8 @@ export class AuditController {
     private readonly workspaceAbility: WorkspaceAbilityFactory,
   ) {}
 
-  /** Audit logs are an enterprise feature and readable by workspace admins only. */
+  /** The audit log is readable by workspace admins/owners only. */
   private authorize(user: User, workspace: Workspace) {
-    if (!workspace?.licenseKey) {
-      throw new ForbiddenException('An enterprise license is required');
-    }
     const ability = this.workspaceAbility.createForUser(user, workspace);
     if (
       ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings)

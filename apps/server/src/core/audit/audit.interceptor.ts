@@ -45,9 +45,8 @@ export class AuditInterceptor implements NestInterceptor {
       const user = req?.user?.user;
       const workspace = req?.raw?.workspace ?? req?.user?.workspace;
 
-      // enterprise-gated: only record for licensed workspaces, and only for
-      // authenticated actors
-      if (!user?.id || !workspace?.id || !workspace?.licenseKey) {
+      // record authenticated actions only (skip anonymous/login requests)
+      if (!user?.id || !workspace?.id) {
         return;
       }
 
