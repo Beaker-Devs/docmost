@@ -26,6 +26,7 @@ import { UserTokenRepo } from './repos/user-token/user-token.repo';
 import { BacklinkRepo } from '@docmost/db/repos/backlink/backlink.repo';
 import { ShareRepo } from '@docmost/db/repos/share/share.repo';
 import { BoardRepo } from '@docmost/db/repos/board/board.repo';
+import { AuditRepo } from '@docmost/db/repos/audit/audit.repo';
 
 // https://github.com/brianc/node-postgres/issues/811
 types.setTypeParser(types.builtins.INT8, (val) => Number(val));
@@ -77,7 +78,8 @@ types.setTypeParser(types.builtins.INT8, (val) => Number(val));
     UserTokenRepo,
     BacklinkRepo,
     ShareRepo,
-    BoardRepo
+    BoardRepo,
+    AuditRepo
   ],
   exports: [
     WorkspaceRepo,
@@ -93,7 +95,8 @@ types.setTypeParser(types.builtins.INT8, (val) => Number(val));
     UserTokenRepo,
     BacklinkRepo,
     ShareRepo,
-    BoardRepo
+    BoardRepo,
+    AuditRepo
   ],
 })
 export class DatabaseModule

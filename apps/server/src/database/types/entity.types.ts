@@ -20,6 +20,7 @@ import {
   Boards,
   BoardColumns,
   Cards,
+  AuditLogs,
 } from './db';
 
 // Workspace
@@ -125,3 +126,8 @@ export type UpdatableBoardColumn = Updateable<Omit<BoardColumns, 'id'>>;
 export type Card = Selectable<Cards>;
 export type InsertableCard = Insertable<Cards>;
 export type UpdatableCard = Updateable<Omit<Cards, 'id'>>;
+
+// AuditLog
+export type AuditLog = Selectable<AuditLogs>;
+export type InsertableAuditLog = Insertable<AuditLogs>;
+export type UpdatableAuditLog = Updateable<Omit<AuditLogs, 'id'>>;
