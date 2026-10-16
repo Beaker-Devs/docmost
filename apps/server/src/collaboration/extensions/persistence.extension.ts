@@ -24,17 +24,26 @@ import {
 import { isDeepStrictEqual } from 'node:util';
 import { IPageBacklinkJob } from '../../integrations/queue/constants/queue.interface';
 import { Page } from '@docmost/db/types/entity.types';
+import { AuditService } from '../../core/audit/audit.service';
+import { EditSessionThrottle } from '../../core/audit/edit-session-throttle';
+
+/** Coalesce rapid autosaves into one "edited page" audit entry per 5 min. */
+const CONTENT_EDIT_AUDIT_WINDOW_MS = 5 * 60 * 1000;
 
 @Injectable()
 export class PersistenceExtension implements Extension {
   private readonly logger = new Logger(PersistenceExtension.name);
   private contributors: Map<string, Set<string>> = new Map();
+  private readonly editAuditThrottle = new EditSessionThrottle(
+    CONTENT_EDIT_AUDIT_WINDOW_MS,
+  );
 
   constructor(
     private readonly pageRepo: PageRepo,
     @InjectKysely() private readonly db: KyselyDB,
     private eventEmitter: EventEmitter2,
     @InjectQueue(QueueName.GENERAL_QUEUE) private generalQueue: Queue,
+    private readonly auditService: AuditService,
   ) {}
 
   async onLoadDocument(data: onLoadDocumentPayload) {
@@ -159,6 +168,24 @@ export class PersistenceExtension implements Extension {
           lastUpdatedById: context.user.id,
         },
       });
+
+      // Record a content edit in the audit log. Collaborative edits bypass the
+      // HTTP pipeline (and thus the audit interceptor), so they are captured
+      // here, throttled to one entry per editing session.
+      const editorId = context.user?.id;
+      if (
+        editorId &&
+        this.editAuditThrottle.shouldRecord(`${pageId}:${editorId}`)
+      ) {
+        void this.auditService.record({
+          action: 'page.content_update',
+          resourceType: 'page',
+          resourceId: pageId,
+          detail: { title: page.title, slugId: page.slugId },
+          userId: editorId,
+          workspaceId: page.workspaceId,
+        });
+      }
 
       const mentions = extractMentions(tiptapJson);
       const pageMentions = extractPageMentions(mentions);

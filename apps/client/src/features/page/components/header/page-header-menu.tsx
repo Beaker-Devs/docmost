@@ -1,5 +1,6 @@
 import { ActionIcon, Group, Menu, Text, Tooltip } from "@mantine/core";
 import {
+  IconActivity,
   IconArrowRight,
   IconArrowsHorizontal,
   IconDots,
@@ -36,6 +37,7 @@ import { formattedDate, timeAgo } from "@/lib/time.ts";
 import MovePageModal from "@/features/page/components/move-page-modal.tsx";
 import { useTimeAgo } from "@/hooks/use-time-ago.tsx";
 import ShareModal from "@/features/share/components/share-modal.tsx";
+import PageActivityModal from "@/features/audit/components/page-activity-modal.tsx";
 
 interface PageHeaderMenuProps {
   readOnly?: boolean;
@@ -105,6 +107,10 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
     movePageModalOpened,
     { open: openMovePageModal, close: closeMoveSpaceModal },
   ] = useDisclosure(false);
+  const [
+    activityModalOpened,
+    { open: openActivityModal, close: closeActivityModal },
+  ] = useDisclosure(false);
   const [pageEditor] = useAtom(pageEditorAtom);
   const pageUpdatedAt = useTimeAgo(page?.updatedAt);
 
@@ -166,6 +172,13 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
             onClick={openHistoryModal}
           >
             {t("Page history")}
+          </Menu.Item>
+
+          <Menu.Item
+            leftSection={<IconActivity size={16} />}
+            onClick={openActivityModal}
+          >
+            {t("Page activity")}
           </Menu.Item>
 
           <Menu.Divider />
@@ -256,6 +269,12 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
         currentSpaceSlug={spaceSlug}
         onClose={closeMoveSpaceModal}
         open={movePageModalOpened}
+      />
+
+      <PageActivityModal
+        pageId={page.id}
+        opened={activityModalOpened}
+        onClose={closeActivityModal}
       />
     </>
   );

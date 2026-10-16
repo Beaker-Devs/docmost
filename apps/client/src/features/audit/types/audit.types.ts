@@ -32,3 +32,9 @@ export interface IAuditLogParams {
   startDate?: string;
   endDate?: string;
 }
+
+export interface IPageActivityParams {
+  pageId: string;
+  limit?: number;
+  cursor?: string | null;
+}

@@ -43,6 +43,25 @@ export class AuditService {
     };
   }
 
+  /** Audit trail scoped to a single page (its own activity feed). */
+  async listForPage(
+    workspaceId: string,
+    pageId: string,
+    opts: { cursor?: string; limit?: number },
+  ) {
+    const limit = opts.limit ?? 30;
+    const { items, nextCursorId } = await this.auditRepo.getWorkspaceAuditLogs(
+      workspaceId,
+      { resourceType: 'page', resourceId: pageId },
+      { limit, cursorId: decodeAuditCursor(opts.cursor) },
+    );
+
+    return {
+      items,
+      nextCursor: nextCursorId ? encodeAuditCursor(nextCursorId) : null,
+    };
+  }
+
   async getActions(workspaceId: string): Promise<string[]> {
     return this.auditRepo.getDistinctActions(workspaceId);
   }

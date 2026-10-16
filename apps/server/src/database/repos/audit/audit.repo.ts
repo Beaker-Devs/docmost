@@ -13,6 +13,8 @@ import { jsonObjectFrom } from 'kysely/helpers/postgres';
 export interface AuditLogFilters {
   userId?: string;
   action?: string;
+  resourceType?: string;
+  resourceId?: string;
   startDate?: Date;
   endDate?: Date;
 }
@@ -74,6 +76,12 @@ export class AuditRepo {
     }
     if (filters.action) {
       query = query.where('action', '=', filters.action);
+    }
+    if (filters.resourceType) {
+      query = query.where('resourceType', '=', filters.resourceType);
+    }
+    if (filters.resourceId) {
+      query = query.where('resourceId', '=', filters.resourceId);
     }
     if (filters.startDate) {
       query = query.where('createdAt', '>=', filters.startDate);

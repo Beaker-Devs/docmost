@@ -6,6 +6,7 @@ const ACTION_LABELS: Record<string, string> = {
   "auth.logout": "Signed out",
   "page.create": "Created page",
   "page.update": "Updated page",
+  "page.content_update": "Edited page",
   "page.delete": "Deleted page",
   "page.move": "Moved page",
   "page.move_to_space": "Moved page to space",
