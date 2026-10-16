@@ -18,6 +18,7 @@ import {
   IconTypography,
   IconMenu4,
   IconCalendar,
+  IconDatabase,
 } from "@tabler/icons-react";
 import {
   CommandProps,
@@ -240,6 +241,14 @@ const CommandGroups: SlashMenuGroupedItemsType = {
           .deleteRange(range)
           .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
           .run(),
+    },
+    {
+      title: "Database",
+      description: "Insert a database (table, board, filters, views).",
+      searchTerms: ["database", "table view", "board", "grid", "notion"],
+      icon: IconDatabase,
+      command: ({ editor, range }: CommandProps) =>
+        editor.chain().focus().deleteRange(range).setDatabase().run(),
     },
     {
       title: "Toggle block",
