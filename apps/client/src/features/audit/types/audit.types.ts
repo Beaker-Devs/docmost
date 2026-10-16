@@ -19,9 +19,14 @@ export interface IAuditLog {
   actor: IAuditActor | null;
 }
 
+export interface IAuditLogList {
+  items: IAuditLog[];
+  nextCursor: string | null;
+}
+
 export interface IAuditLogParams {
-  page?: number;
   limit?: number;
+  cursor?: string | null;
   userId?: string;
   action?: string;
   startDate?: string;

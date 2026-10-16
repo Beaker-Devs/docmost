@@ -29,6 +29,7 @@ import { InjectKysely } from 'nestjs-kysely';
 import { executeTx } from '@docmost/db/utils';
 import { VerifyUserTokenDto } from '../dto/verify-user-token.dto';
 import { DomainService } from '../../../integrations/environment/domain.service';
+import { AuditService } from '../../audit/audit.service';
 
 @Injectable()
 export class AuthService {
@@ -39,10 +40,15 @@ export class AuthService {
     private userTokenRepo: UserTokenRepo,
     private mailService: MailService,
     private domainService: DomainService,
+    private auditService: AuditService,
     @InjectKysely() private readonly db: KyselyDB,
   ) {}
 
-  async login(loginDto: LoginDto, workspaceId: string) {
+  async login(
+    loginDto: LoginDto,
+    workspaceId: string,
+    context?: { ipAddress?: string | null; userAgent?: string | null },
+  ) {
     const user = await this.userRepo.findByEmail(loginDto.email, workspaceId, {
       includePassword: true,
     });
@@ -63,6 +69,15 @@ export class AuthService {
 
     user.lastLoginAt = new Date();
     await this.userRepo.updateLastLogin(user.id, workspaceId);
+
+    await this.auditService.record({
+      workspaceId,
+      userId: user.id,
+      action: 'auth.login',
+      resourceType: 'auth',
+      ipAddress: context?.ipAddress ?? null,
+      userAgent: context?.userAgent ?? null,
+    });
 
     return this.tokenService.generateAccessToken(user);
   }

@@ -11,6 +11,10 @@ export interface AuditRouteDef {
 }
 
 export const AUDIT_ROUTES: Record<string, AuditRouteDef> = {
+  // auth (logout is authenticated → captured by the interceptor; login is
+  // recorded explicitly in AuthService since there is no auth context yet)
+  '/api/auth/logout': { action: 'auth.logout', resourceType: 'auth' },
+
   // pages
   '/api/pages/create': { action: 'page.create', resourceType: 'page' },
   '/api/pages/update': { action: 'page.update', resourceType: 'page', resourceIdField: 'pageId' },
@@ -81,6 +85,8 @@ export const AUDIT_SAFE_FIELDS = [
 
 /** Human-readable labels for actions (English source; UI re-translates). */
 export const AUDIT_ACTION_LABELS: Record<string, string> = {
+  'auth.login': 'Signed in',
+  'auth.logout': 'Signed out',
   'page.create': 'Created page',
   'page.update': 'Updated page',
   'page.delete': 'Deleted page',

@@ -22,6 +22,14 @@ import {
 import { auditActionLabel } from "@/features/audit/audit-labels.ts";
 import { IAuditLog } from "@/features/audit/types/audit.types.ts";
 import { useWorkspaceMembersQuery } from "@/features/workspace/queries/workspace-query.ts";
+import {
+  CursorState,
+  canGoPrev,
+  goNext,
+  goPrev,
+  initialCursorState,
+  pageNumber,
+} from "@/features/audit/audit-pagination.ts";
 
 function resourceSummary(log: IAuditLog): string {
   const d = log.detail || {};
@@ -34,13 +42,15 @@ export default function AuditLog() {
   const { t } = useTranslation();
   const { isAdmin } = useUserRole();
 
-  const [page, setPage] = useState(1);
+  const [cursorState, setCursorState] = useState<CursorState>(
+    initialCursorState(),
+  );
   const [action, setAction] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
   const { data, isLoading } = useAuditLogsQuery({
-    page,
     limit: 30,
+    cursor: cursorState.cursor,
     action: action ?? undefined,
     userId: userId ?? undefined,
   });
@@ -78,7 +88,7 @@ export default function AuditLog() {
           value={action}
           onChange={(v) => {
             setAction(v);
-            setPage(1);
+            setCursorState(initialCursorState());
           }}
           searchable
           clearable
@@ -90,7 +100,7 @@ export default function AuditLog() {
           value={userId}
           onChange={(v) => {
             setUserId(v);
-            setPage(1);
+            setCursorState(initialCursorState());
           }}
           searchable
           clearable
@@ -167,14 +177,20 @@ export default function AuditLog() {
         </Table>
       </Table.ScrollContainer>
 
-      {data?.meta && (
-        <Paginate
-          currentPage={page}
-          hasPrevPage={data.meta.hasPrevPage}
-          hasNextPage={data.meta.hasNextPage}
-          onPageChange={setPage}
-        />
-      )}
+      <Paginate
+        currentPage={pageNumber(cursorState)}
+        hasPrevPage={canGoPrev(cursorState)}
+        hasNextPage={!!data?.nextCursor}
+        onPageChange={(newPage) => {
+          if (newPage > pageNumber(cursorState)) {
+            if (data?.nextCursor) {
+              setCursorState((s) => goNext(s, data.nextCursor as string));
+            }
+          } else {
+            setCursorState((s) => goPrev(s));
+          }
+        }}
+      />
     </>
   );
 }

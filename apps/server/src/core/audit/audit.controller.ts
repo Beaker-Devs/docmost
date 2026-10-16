@@ -13,7 +13,6 @@ import { AuthUser } from '../../common/decorators/auth-user.decorator';
 import { AuthWorkspace } from '../../common/decorators/auth-workspace.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { User, Workspace } from '@docmost/db/types/entity.types';
-import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import WorkspaceAbilityFactory from '../casl/abilities/workspace-ability.factory';
 import {
   WorkspaceCaslAction,
@@ -42,12 +41,11 @@ export class AuditController {
   @Post('/list')
   async list(
     @Body() dto: ListAuditLogsDto,
-    @Body() pagination: PaginationOptions,
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
   ) {
     this.authorize(user, workspace);
-    return this.auditService.list(workspace.id, dto, pagination);
+    return this.auditService.list(workspace.id, dto);
   }
 
   @HttpCode(HttpStatus.OK)

@@ -2,6 +2,8 @@ import { TFunction } from "i18next";
 
 // English labels for known audit actions (re-translated via i18n at render).
 const ACTION_LABELS: Record<string, string> = {
+  "auth.login": "Signed in",
+  "auth.logout": "Signed out",
   "page.create": "Created page",
   "page.update": "Updated page",
   "page.delete": "Deleted page",

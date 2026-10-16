@@ -22,7 +22,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { PasswordResetDto } from './dto/password-reset.dto';
 import { VerifyUserTokenDto } from './dto/verify-user-token.dto';
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { addDays } from 'date-fns';
 import { validateSsoEnforcement } from './auth.util';
 
@@ -39,10 +39,17 @@ export class AuthController {
     @AuthWorkspace() workspace: Workspace,
     @Res({ passthrough: true }) res: FastifyReply,
     @Body() loginInput: LoginDto,
+    @Req() req: FastifyRequest,
   ) {
     validateSsoEnforcement(workspace);
 
-    const authToken = await this.authService.login(loginInput, workspace.id);
+    const authToken = await this.authService.login(loginInput, workspace.id, {
+      ipAddress:
+        (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+        req.ip ||
+        null,
+      userAgent: req.headers['user-agent']?.slice(0, 512) ?? null,
+    });
     this.setAuthCookie(res, authToken);
   }
 

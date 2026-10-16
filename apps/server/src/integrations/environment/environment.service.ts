@@ -48,6 +48,15 @@ export class EnvironmentService {
     return parseInt(this.configService.get<string>('DATABASE_MAX_POOL', '10'));
   }
 
+  /** Days to retain audit logs; 0 (or less) disables pruning. */
+  getAuditLogRetentionDays(): number {
+    const value = parseInt(
+      this.configService.get<string>('AUDIT_LOG_RETENTION_DAYS', '90'),
+      10,
+    );
+    return Number.isFinite(value) && value > 0 ? value : 0;
+  }
+
   getRedisUrl(): string {
     return this.configService.get<string>(
       'REDIS_URL',

@@ -9,14 +9,17 @@ import {
 import { ExpressionBuilder } from 'kysely';
 import { DB } from '@docmost/db/types/db';
 import { jsonObjectFrom } from 'kysely/helpers/postgres';
-import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
-import { executeWithPagination } from '@docmost/db/pagination/pagination';
 
 export interface AuditLogFilters {
   userId?: string;
   action?: string;
   startDate?: Date;
   endDate?: Date;
+}
+
+export interface KeysetOptions {
+  limit: number;
+  cursorId?: string | null;
 }
 
 @Injectable()
@@ -46,18 +49,26 @@ export class AuditRepo {
       .execute();
   }
 
+  /**
+   * Keyset pagination on id (uuid v7 → chronological). Returns up to `limit`
+   * rows plus a nextCursor (the last row's id) when more remain.
+   */
   async getWorkspaceAuditLogs(
     workspaceId: string,
     filters: AuditLogFilters,
-    pagination: PaginationOptions,
-  ) {
+    opts: KeysetOptions,
+  ): Promise<{ items: any[]; nextCursorId: string | null }> {
     let query = this.db
       .selectFrom('auditLogs')
       .select(this.baseFields)
       .select((eb) => this.withActor(eb))
       .where('workspaceId', '=', workspaceId)
-      .orderBy('createdAt', 'desc');
+      .orderBy('id', 'desc')
+      .limit(opts.limit + 1); // fetch one extra to detect a next page
 
+    if (opts.cursorId) {
+      query = query.where('id', '<', opts.cursorId);
+    }
     if (filters.userId) {
       query = query.where('userId', '=', filters.userId);
     }
@@ -71,10 +82,19 @@ export class AuditRepo {
       query = query.where('createdAt', '<=', filters.endDate);
     }
 
-    return executeWithPagination(query, {
-      page: pagination.page,
-      perPage: pagination.limit,
-    });
+    const rows = await query.execute();
+    const hasMore = rows.length > opts.limit;
+    const items = hasMore ? rows.slice(0, opts.limit) : rows;
+    const nextCursorId = hasMore ? items[items.length - 1].id : null;
+    return { items, nextCursorId };
+  }
+
+  async deleteOlderThan(cutoff: Date): Promise<number> {
+    const result = await this.db
+      .deleteFrom('auditLogs')
+      .where('createdAt', '<', cutoff)
+      .executeTakeFirst();
+    return Number(result?.numDeletedRows ?? 0);
   }
 
   /** Distinct action keys present for a workspace, for the filter dropdown. */

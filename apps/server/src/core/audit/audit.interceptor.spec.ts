@@ -99,4 +99,10 @@ describe('AuditInterceptor', () => {
     run(interceptor, req({ url: '/api/pages/create?foo=bar', body: { title: 'Q' } }));
     expect(service.record).toHaveBeenCalledTimes(1);
   });
+
+  it('captures logout (authenticated allowlisted route)', () => {
+    run(interceptor, req({ url: '/api/auth/logout', body: {} }));
+    expect(service.record).toHaveBeenCalledTimes(1);
+    expect(service.record.mock.calls[0][0].action).toBe('auth.logout');
+  });
 });

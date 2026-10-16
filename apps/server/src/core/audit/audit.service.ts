@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AuditRepo } from '@docmost/db/repos/audit/audit.repo';
 import { InsertableAuditLog } from '@docmost/db/types/entity.types';
-import { PaginationOptions } from '@docmost/db/pagination/pagination-options';
 import { ListAuditLogsDto } from './dto/list-audit.dto';
+import { decodeAuditCursor, encodeAuditCursor } from './audit-cursor';
 
 @Injectable()
 export class AuditService {
@@ -24,12 +24,9 @@ export class AuditService {
     }
   }
 
-  async list(
-    workspaceId: string,
-    dto: ListAuditLogsDto,
-    pagination: PaginationOptions,
-  ) {
-    return this.auditRepo.getWorkspaceAuditLogs(
+  async list(workspaceId: string, dto: ListAuditLogsDto) {
+    const limit = dto.limit ?? 30;
+    const { items, nextCursorId } = await this.auditRepo.getWorkspaceAuditLogs(
       workspaceId,
       {
         userId: dto.userId,
@@ -37,8 +34,13 @@ export class AuditService {
         startDate: dto.startDate ? new Date(dto.startDate) : undefined,
         endDate: dto.endDate ? new Date(dto.endDate) : undefined,
       },
-      pagination,
+      { limit, cursorId: decodeAuditCursor(dto.cursor) },
     );
+
+    return {
+      items,
+      nextCursor: nextCursorId ? encodeAuditCursor(nextCursorId) : null,
+    };
   }
 
   async getActions(workspaceId: string): Promise<string[]> {
