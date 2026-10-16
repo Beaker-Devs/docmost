@@ -35,7 +35,7 @@ test.describe("page activity", () => {
     await login(page);
   });
 
-  test("opens the activity modal with the page's own trail", async ({
+  test("shows the page's activity in the version history view", async ({
     page,
   }) => {
     await page.goto(PAGE_PATH!);
@@ -44,9 +44,12 @@ test.describe("page activity", () => {
       .first()
       .waitFor({ state: "visible", timeout: 25_000 });
 
-    // open the "..." page action menu -> Page activity
+    // open the "..." page action menu -> Version history
     await page.locator("button:has(svg.tabler-icon-dots)").last().click();
-    await page.getByRole("menuitem", { name: "Page activity" }).click();
+    await page.getByRole("menuitem", { name: "Version history" }).click();
+
+    // switch to the Activity tab within the combined view
+    await page.getByRole("tab", { name: "Activity" }).click();
 
     await expect(
       page.getByText("A record of recent activity on this page."),

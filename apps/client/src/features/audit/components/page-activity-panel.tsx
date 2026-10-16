@@ -1,11 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Badge,
-  Group,
-  Modal,
-  Table,
-  Text,
-} from "@mantine/core";
+import { Badge, Group, ScrollArea, Table, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
 import Paginate from "@/components/common/paginate.tsx";
@@ -21,48 +15,40 @@ import {
   pageNumber,
 } from "@/features/audit/audit-pagination.ts";
 
-interface PageActivityModalProps {
+interface PageActivityPanelProps {
   pageId: string;
-  opened: boolean;
-  onClose: () => void;
+  /** only fetch when the panel is actually shown */
+  active?: boolean;
 }
 
-export default function PageActivityModal({
+export default function PageActivityPanel({
   pageId,
-  opened,
-  onClose,
-}: PageActivityModalProps) {
+  active = true,
+}: PageActivityPanelProps) {
   const { t } = useTranslation();
   const [cursorState, setCursorState] = useState<CursorState>(
     initialCursorState(),
   );
 
-  // reset paging whenever the modal is (re)opened or the page changes
+  // reset paging when the page changes
   useEffect(() => {
-    if (opened) {
-      setCursorState(initialCursorState());
-    }
-  }, [opened, pageId]);
+    setCursorState(initialCursorState());
+  }, [pageId]);
 
   const { data, isLoading } = usePageActivityQuery(
     { pageId, limit: 20, cursor: cursorState.cursor },
-    opened,
+    active,
   );
 
   const logs = data?.items ?? [];
 
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title={t("Page activity")}
-      size="lg"
-    >
+    <div>
       <Text size="sm" c="dimmed" mb="md">
         {t("A record of recent activity on this page.")}
       </Text>
 
-      <Table.ScrollContainer minWidth={500}>
+      <ScrollArea.Autosize mah={560}>
         <Table highlightOnHover verticalSpacing="sm">
           <Table.Thead>
             <Table.Tr>
@@ -110,7 +96,7 @@ export default function PageActivityModal({
             )}
           </Table.Tbody>
         </Table>
-      </Table.ScrollContainer>
+      </ScrollArea.Autosize>
 
       <Paginate
         currentPage={pageNumber(cursorState)}
@@ -126,6 +112,6 @@ export default function PageActivityModal({
           }
         }}
       />
-    </Modal>
+    </div>
   );
 }
