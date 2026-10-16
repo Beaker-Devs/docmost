@@ -9,6 +9,7 @@ import { WebSocket } from 'ws';
 import { TokenModule } from '../core/auth/token.module';
 import { HistoryListener } from './listeners/history.listener';
 import { LoggerExtension } from './extensions/logger.extension';
+import { AuditModule } from '../core/audit/audit.module';
 
 @Module({
   providers: [
@@ -19,7 +20,7 @@ import { LoggerExtension } from './extensions/logger.extension';
     HistoryListener,
   ],
   exports: [CollaborationGateway],
-  imports: [TokenModule],
+  imports: [TokenModule, AuditModule],
 })
 export class CollaborationModule implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(CollaborationModule.name);

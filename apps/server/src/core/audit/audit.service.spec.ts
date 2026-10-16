@@ -78,6 +78,43 @@ describe('AuditService', () => {
     });
   });
 
+  describe('listForPage', () => {
+    it('scopes the query to the page resource and workspace', async () => {
+      repo.getWorkspaceAuditLogs.mockResolvedValue({
+        items: [{ id: 'a1' }],
+        nextCursorId: null,
+      });
+
+      const result = await service.listForPage('w1', 'page-1', { limit: 20 });
+
+      const [workspaceId, filters, opts] =
+        repo.getWorkspaceAuditLogs.mock.calls[0];
+      expect(workspaceId).toBe('w1');
+      expect(filters.resourceType).toBe('page');
+      expect(filters.resourceId).toBe('page-1');
+      expect(opts.limit).toBe(20);
+      expect(result.items).toEqual([{ id: 'a1' }]);
+      expect(result.nextCursor).toBeNull();
+    });
+
+    it('decodes the cursor and encodes the next cursor', async () => {
+      const cursor = Buffer.from('id-200', 'utf8').toString('base64url');
+      repo.getWorkspaceAuditLogs.mockResolvedValue({
+        items: [{ id: 'id-150' }],
+        nextCursorId: 'id-150',
+      });
+
+      const result = await service.listForPage('w1', 'page-1', { cursor });
+
+      expect(repo.getWorkspaceAuditLogs.mock.calls[0][2].cursorId).toBe(
+        'id-200',
+      );
+      expect(
+        Buffer.from(result.nextCursor as string, 'base64url').toString('utf8'),
+      ).toBe('id-150');
+    });
+  });
+
   describe('getActions', () => {
     it('delegates to the repo', async () => {
       await expect(service.getActions('w1')).resolves.toEqual(['page.create']);

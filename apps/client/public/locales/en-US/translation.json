@@ -1,5 +1,6 @@
 {
   "A record of activity across your workspace.": "A record of activity across your workspace.",
+  "A record of recent activity on this page.": "A record of recent activity on this page.",
   "Account": "Account",
   "Action": "Action",
   "Active": "Active",
@@ -194,6 +195,7 @@
   "Overview": "Overview",
   "Owner": "Owner",
   "page": "page",
+  "Page activity": "Page activity",
   "Page deleted successfully": "Page deleted successfully",
   "Page history": "Page history",
   "Page import is in progress. Please do not close this tab.": "Page import is in progress. Please do not close this tab.",
@@ -425,6 +427,7 @@
   "Created by: <b>{{creatorName}}</b>": "Created by: <b>{{creatorName}}</b>",
   "Created at: {{time}}": "Created at: {{time}}",
   "Edited by {{name}} {{time}}": "Edited by {{name}} {{time}}",
+  "Edited page": "Edited page",
   "Word count: {{wordCount}}": "Word count: {{wordCount}}",
   "Character count: {{characterCount}}": "Character count: {{characterCount}}",
   "New update": "New update",
