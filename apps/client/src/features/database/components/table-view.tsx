@@ -1,5 +1,6 @@
 import { ActionIcon, Button, Table, Text } from "@mantine/core";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import { FieldType, IDatabaseField, IDatabaseRow, ISelectOption } from "../types/database.types";
 import DatabaseCell from "./database-cell";
 import FieldHeader, { AddFieldMenu } from "./field-header";
@@ -37,6 +38,7 @@ export default function TableView({
   onAddField,
   onCreateOption,
 }: Props) {
+  const { t } = useTranslation();
   return (
     <Table.ScrollContainer minWidth={Math.max(500, fields.length * 180 + 80)}>
       <Table withTableBorder withColumnBorders verticalSpacing={4} horizontalSpacing="sm">
@@ -63,7 +65,7 @@ export default function TableView({
             <Table.Tr>
               <Table.Td colSpan={fields.length + 1}>
                 <Text size="sm" c="dimmed" ta="center" py="sm">
-                  No rows yet
+                  {t("No rows yet")}
                 </Text>
               </Table.Td>
             </Table.Tr>
@@ -86,7 +88,7 @@ export default function TableView({
                     variant="subtle"
                     color="gray"
                     size="sm"
-                    aria-label="Delete row"
+                    aria-label={t("Delete row")}
                     onClick={() => onDeleteRow(row.id)}
                   >
                     <IconTrash size={14} />
@@ -105,7 +107,7 @@ export default function TableView({
         onClick={onAddRow}
         mt={4}
       >
-        New row
+        {t("New row")}
       </Button>
     </Table.ScrollContainer>
   );

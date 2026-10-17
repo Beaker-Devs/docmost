@@ -16,6 +16,7 @@ import {
   IconTable,
   IconTrash,
 } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import { useWorkspaceMembersQuery } from "@/features/workspace/queries/workspace-query.ts";
 import {
   useDatabaseMutations,
@@ -33,6 +34,7 @@ interface Props {
 }
 
 export default function DatabaseView({ databaseId }: Props) {
+  const { t } = useTranslation();
   const { data: database, isLoading } = useDatabaseQuery(databaseId);
   const { data: rows } = useDatabaseRowsQuery(databaseId);
   const { data: members } = useWorkspaceMembersQuery({ limit: 100 });
@@ -113,7 +115,7 @@ export default function DatabaseView({ databaseId }: Props) {
         size="md"
         fw={600}
         value={titleDraft}
-        placeholder="Untitled database"
+        placeholder={t("Untitled database")}
         onChange={(e) => setTitleDraft(e.currentTarget.value)}
         onBlur={() => {
           if (titleDraft.trim() && titleDraft !== database.title) {
@@ -164,7 +166,7 @@ export default function DatabaseView({ databaseId }: Props) {
                           leftSection={<IconTrash size={14} />}
                           onClick={() => m.deleteView.mutate(v.id)}
                         >
-                          Delete view
+                          {t("Delete view")}
                         </Menu.Item>
                       </Menu.Dropdown>
                     </Menu>
@@ -179,7 +181,7 @@ export default function DatabaseView({ databaseId }: Props) {
 
         <Menu withinPortal position="bottom-end" shadow="md">
           <Menu.Target>
-            <ActionIcon variant="subtle" color="gray" aria-label="Add view">
+            <ActionIcon variant="subtle" color="gray" aria-label={t("Add view")}>
               <IconPlus size={16} />
             </ActionIcon>
           </Menu.Target>
@@ -188,13 +190,13 @@ export default function DatabaseView({ databaseId }: Props) {
               leftSection={<IconTable size={14} />}
               onClick={() => addView("table")}
             >
-              Table
+              {t("Table")}
             </Menu.Item>
             <Menu.Item
               leftSection={<IconLayoutKanban size={14} />}
               onClick={() => addView("board")}
             >
-              Board
+              {t("Board")}
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
@@ -232,8 +234,7 @@ export default function DatabaseView({ databaseId }: Props) {
           />
         ) : (
           <Alert color="gray" variant="light">
-            Pick a <b>Group</b> property (a Select field) in the toolbar to see
-            the board.
+            {t("Pick a Group property (a Select field) to see the board.")}
           </Alert>
         )
       ) : (

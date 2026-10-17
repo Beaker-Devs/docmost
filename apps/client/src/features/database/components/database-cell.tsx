@@ -10,6 +10,7 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
 import { IDatabaseField, ISelectOption } from "../types/database.types";
 import {
@@ -53,6 +54,7 @@ function SelectCell({
   onCreateOption,
   multi,
 }: CellProps & { multi?: boolean }) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const options = field.config?.options ?? [];
   const selectedIds: string[] = multi
@@ -119,7 +121,7 @@ function SelectCell({
       </Menu.Target>
       <Menu.Dropdown>
         <TextInput
-          placeholder="Search or create…"
+          placeholder={t("Search or create…")}
           size="xs"
           value={search}
           onChange={(e) => setSearch(e.currentTarget.value)}
@@ -141,7 +143,7 @@ function SelectCell({
             leftSection={<IconPlus size={14} />}
             onClick={createAndSelect}
           >
-            Create "{search.trim()}"
+            {t('Create "{{name}}"', { name: search.trim() })}
           </Menu.Item>
         )}
       </Menu.Dropdown>
@@ -150,6 +152,7 @@ function SelectCell({
 }
 
 function UserCell({ value, onChange, members = [] }: CellProps) {
+  const { t } = useTranslation();
   const selected = members.find((m) => m.id === value);
   return (
     <Menu shadow="md" width={240} position="bottom-start" withinPortal>
@@ -174,7 +177,7 @@ function UserCell({ value, onChange, members = [] }: CellProps) {
       <Menu.Dropdown>
         {value && (
           <Menu.Item onClick={() => onChange(null)} c="dimmed">
-            Clear
+            {t("Clear")}
           </Menu.Item>
         )}
         {members.map((m) => (

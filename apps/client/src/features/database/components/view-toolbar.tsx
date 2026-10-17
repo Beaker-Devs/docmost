@@ -15,6 +15,7 @@ import {
   IconPlus,
   IconX,
 } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import {
   FieldType,
   FilterOp,
@@ -76,11 +77,12 @@ function FilterValue({
   onChange: (v: any) => void;
   members: { id: string; name: string }[];
 }) {
+  const { t } = useTranslation();
   if (field.type === "select" || field.type === "multi_select") {
     return (
       <Select
         size="xs"
-        placeholder="value"
+        placeholder={t("Value")}
         data={(field.config?.options ?? []).map((o) => ({
           value: o.id,
           label: o.name,
@@ -95,7 +97,7 @@ function FilterValue({
     return (
       <Select
         size="xs"
-        placeholder="person"
+        placeholder={t("Person")}
         data={members.map((m) => ({ value: m.id, label: m.name }))}
         value={value ?? null}
         onChange={onChange}
@@ -115,7 +117,7 @@ function FilterValue({
   return (
     <TextInput
       size="xs"
-      placeholder="value"
+      placeholder={t("Value")}
       value={value ?? ""}
       onChange={(e) => onChange(e.currentTarget.value)}
       w={130}
@@ -129,6 +131,7 @@ export default function ViewToolbar({
   members,
   onChange,
 }: Props) {
+  const { t } = useTranslation();
   const fieldById = new Map(fields.map((f) => [f.id, f]));
   const selectFields = fields.filter((f) => f.type === "select");
   const fieldOptions = fields.map((f) => ({ value: f.id, label: f.name }));
@@ -161,14 +164,15 @@ export default function ViewToolbar({
             color="gray"
             leftSection={<IconFilter size={14} />}
           >
-            Filter{filters.length ? ` (${filters.length})` : ""}
+            {t("Filter")}
+            {filters.length ? ` (${filters.length})` : ""}
           </Button>
         </Popover.Target>
         <Popover.Dropdown>
           <Stack gap="xs">
             {filters.length === 0 && (
               <Text size="xs" c="dimmed">
-                No filters
+                {t("No filters")}
               </Text>
             )}
             {filters.map((f, i) => {
@@ -195,7 +199,7 @@ export default function ViewToolbar({
                   />
                   <Select
                     size="xs"
-                    data={ops.map((o) => ({ value: o, label: OP_LABEL[o] }))}
+                    data={ops.map((o) => ({ value: o, label: t(OP_LABEL[o]) }))}
                     value={f.op}
                     onChange={(v) => {
                       const next = [...filters];
@@ -235,7 +239,7 @@ export default function ViewToolbar({
               leftSection={<IconPlus size={14} />}
               onClick={addFilter}
             >
-              Add filter
+              {t("Add filter")}
             </Button>
           </Stack>
         </Popover.Dropdown>
@@ -250,14 +254,15 @@ export default function ViewToolbar({
             color="gray"
             leftSection={<IconArrowsSort size={14} />}
           >
-            Sort{sorts.length ? ` (${sorts.length})` : ""}
+            {t("Sort")}
+            {sorts.length ? ` (${sorts.length})` : ""}
           </Button>
         </Popover.Target>
         <Popover.Dropdown>
           <Stack gap="xs">
             {sorts.length === 0 && (
               <Text size="xs" c="dimmed">
-                No sorts
+                {t("No sorts")}
               </Text>
             )}
             {sorts.map((s, i) => (
@@ -276,8 +281,8 @@ export default function ViewToolbar({
                 <Select
                   size="xs"
                   data={[
-                    { value: "asc", label: "Ascending" },
-                    { value: "desc", label: "Descending" },
+                    { value: "asc", label: t("Ascending") },
+                    { value: "desc", label: t("Descending") },
                   ]}
                   value={s.direction}
                   onChange={(v) => {
@@ -303,7 +308,7 @@ export default function ViewToolbar({
               leftSection={<IconPlus size={14} />}
               onClick={addSort}
             >
-              Add sort
+              {t("Add sort")}
             </Button>
           </Stack>
         </Popover.Dropdown>
@@ -314,7 +319,7 @@ export default function ViewToolbar({
         size="xs"
         variant="subtle"
         leftSection={<IconLayoutColumns size={14} />}
-        placeholder="Group"
+        placeholder={t("Group")}
         clearable
         data={selectFields.map((f) => ({ value: f.id, label: f.name }))}
         value={view.groupBy}

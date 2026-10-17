@@ -2,6 +2,7 @@ import { NodeViewProps, NodeViewWrapper } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
 import { Box, Button, Group, Loader, Text } from "@mantine/core";
 import { IconDatabase } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { usePageQuery } from "@/features/page/queries/page-query.ts";
 import { extractPageSlugId } from "@/lib";
@@ -10,6 +11,7 @@ import DatabaseView from "@/features/database/components/database-view";
 
 export default function DatabaseNodeView(props: NodeViewProps) {
   const { node, updateAttributes, editor } = props;
+  const { t } = useTranslation();
   const databaseId: string | null = node.attrs.databaseId;
   const editable = editor.isEditable;
 
@@ -62,16 +64,16 @@ export default function DatabaseNodeView(props: NodeViewProps) {
               <Group gap="xs">
                 <Loader size="xs" />
                 <Text size="sm" c="dimmed">
-                  Creating database…
+                  {t("Creating database…")}
                 </Text>
               </Group>
             ) : editable ? (
               <Button size="xs" variant="light" onClick={create}>
-                Create database
+                {t("Create database")}
               </Button>
             ) : (
               <Text size="sm" c="dimmed">
-                Empty database
+                {t("Empty database")}
               </Text>
             )}
           </Group>

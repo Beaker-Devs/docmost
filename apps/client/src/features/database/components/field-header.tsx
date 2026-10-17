@@ -18,6 +18,7 @@ import {
   IconTrash,
   IconUser,
 } from "@tabler/icons-react";
+import { useTranslation } from "react-i18next";
 import { FieldType, IDatabaseField } from "../types/database.types";
 import { FIELD_TYPE_LABELS } from "../lib/field-constants";
 
@@ -47,6 +48,7 @@ export default function FieldHeader({
   onDelete,
   canDelete,
 }: Props) {
+  const { t } = useTranslation();
   const [name, setName] = useState(field.name);
   const Icon = TYPE_ICON[field.type];
 
@@ -79,17 +81,19 @@ export default function FieldHeader({
           }}
           mb={6}
         />
-        <Menu.Label>Type</Menu.Label>
-        {(Object.keys(FIELD_TYPE_LABELS) as FieldType[]).map((t) => {
-          const TIcon = TYPE_ICON[t];
+        <Menu.Label>{t("Type")}</Menu.Label>
+        {(Object.keys(FIELD_TYPE_LABELS) as FieldType[]).map((ft) => {
+          const TIcon = TYPE_ICON[ft];
           return (
             <Menu.Item
-              key={t}
+              key={ft}
               leftSection={<TIcon size={14} />}
-              rightSection={field.type === t ? <Text size="xs">✓</Text> : null}
-              onClick={() => onChangeType(t)}
+              rightSection={
+                field.type === ft ? <Text size="xs">✓</Text> : null
+              }
+              onClick={() => onChangeType(ft)}
             >
-              {FIELD_TYPE_LABELS[t]}
+              {t(FIELD_TYPE_LABELS[ft])}
             </Menu.Item>
           );
         })}
@@ -101,7 +105,7 @@ export default function FieldHeader({
               leftSection={<IconTrash size={14} />}
               onClick={onDelete}
             >
-              Delete property
+              {t("Delete property")}
             </Menu.Item>
           </>
         )}
@@ -115,24 +119,25 @@ interface AddFieldProps {
 }
 
 export function AddFieldMenu({ onAdd }: AddFieldProps) {
+  const { t } = useTranslation();
   return (
     <Menu shadow="md" width={220} position="bottom-start" withinPortal>
       <Menu.Target>
-        <ActionIcon variant="subtle" color="gray" aria-label="Add property">
+        <ActionIcon variant="subtle" color="gray" aria-label={t("Add property")}>
           <Text size="sm">+</Text>
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Label>New property</Menu.Label>
-        {(Object.keys(FIELD_TYPE_LABELS) as FieldType[]).map((t) => {
-          const TIcon = TYPE_ICON[t];
+        <Menu.Label>{t("New property")}</Menu.Label>
+        {(Object.keys(FIELD_TYPE_LABELS) as FieldType[]).map((ft) => {
+          const TIcon = TYPE_ICON[ft];
           return (
             <Menu.Item
-              key={t}
+              key={ft}
               leftSection={<TIcon size={14} />}
-              onClick={() => onAdd(FIELD_TYPE_LABELS[t], t)}
+              onClick={() => onAdd(FIELD_TYPE_LABELS[ft], ft)}
             >
-              {FIELD_TYPE_LABELS[t]}
+              {t(FIELD_TYPE_LABELS[ft])}
             </Menu.Item>
           );
         })}
