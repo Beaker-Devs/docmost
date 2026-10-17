@@ -27,6 +27,7 @@ import { BacklinkRepo } from '@docmost/db/repos/backlink/backlink.repo';
 import { ShareRepo } from '@docmost/db/repos/share/share.repo';
 import { BoardRepo } from '@docmost/db/repos/board/board.repo';
 import { AuditRepo } from '@docmost/db/repos/audit/audit.repo';
+import { DatabaseRepo } from '@docmost/db/repos/database/database.repo';
 
 // https://github.com/brianc/node-postgres/issues/811
 types.setTypeParser(types.builtins.INT8, (val) => Number(val));
@@ -79,7 +80,8 @@ types.setTypeParser(types.builtins.INT8, (val) => Number(val));
     BacklinkRepo,
     ShareRepo,
     BoardRepo,
-    AuditRepo
+    AuditRepo,
+    DatabaseRepo
   ],
   exports: [
     WorkspaceRepo,
@@ -96,7 +98,8 @@ types.setTypeParser(types.builtins.INT8, (val) => Number(val));
     BacklinkRepo,
     ShareRepo,
     BoardRepo,
-    AuditRepo
+    AuditRepo,
+    DatabaseRepo
   ],
 })
 export class DatabaseModule

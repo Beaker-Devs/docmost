@@ -37,6 +37,7 @@ import {
   Excalidraw,
   Embed,
   Mention,
+  DatabaseNode,
 } from "@docmost/editor-ext";
 import {
   randomElement,
@@ -56,6 +57,7 @@ import CodeBlockView from "@/features/editor/components/code-block/code-block-vi
 import DrawioView from "../components/drawio/drawio-view";
 import ExcalidrawView from "@/features/editor/components/excalidraw/excalidraw-view.tsx";
 import EmbedView from "@/features/editor/components/embed/embed-view.tsx";
+import DatabaseNodeView from "@/features/editor/components/database/database-node-view.tsx";
 import plaintext from "highlight.js/lib/languages/plaintext";
 import powershell from "highlight.js/lib/languages/powershell";
 import abap from "highlightjs-sap-abap";
@@ -206,6 +208,9 @@ export const mainExtensions = [
   }),
   Excalidraw.configure({
     view: ExcalidrawView,
+  }),
+  DatabaseNode.configure({
+    view: DatabaseNodeView,
   }),
   Embed.configure({
     view: EmbedView,
